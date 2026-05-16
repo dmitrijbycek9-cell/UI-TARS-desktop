@@ -4,7 +4,7 @@
  */
 import { useCallback, useState, type ComponentProps } from 'react';
 import { useNavigate, useLocation } from 'react-router';
-import { Home } from 'lucide-react';
+import { Home, UtensilsCrossed } from 'lucide-react';
 
 import {
   Sidebar,
@@ -21,6 +21,7 @@ import { NavHistory } from './nav-history';
 import { NavSettings } from './nav-footer';
 import { UITarsHeader } from './nav-header';
 
+import { cn } from '@renderer/utils';
 import { Operator } from '@main/store/types';
 import { useGlobalSettings, GlobalSettings } from '../Settings/global';
 import { useStore } from '../../hooks/useStore';
@@ -151,6 +152,16 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
             >
               <Home />
               Home
+            </SidebarMenuButton>
+            <SidebarMenuButton
+              className={cn(
+                'font-medium',
+                location.pathname === '/diet-diary' && 'bg-sidebar-accent',
+              )}
+              onClick={() => navigate('/diet-diary')}
+            >
+              <UtensilsCrossed />
+              Diet Diary
             </SidebarMenuButton>
           </SidebarMenu>
         </SidebarHeader>
