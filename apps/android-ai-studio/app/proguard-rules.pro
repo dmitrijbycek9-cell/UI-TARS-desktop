@@ -1,0 +1,5 @@
+-keep class com.uitars.aistudio.data.model.** { *; }
+-keep class com.google.gson.** { *; }
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn com.google.errorprone.**

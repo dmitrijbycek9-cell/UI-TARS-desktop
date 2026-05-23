@@ -1,0 +1,45 @@
+{
+  "_INSTRUCTIONS_": "Replace this file with your real google-services.json from Firebase Console",
+  "_STEPS_": [
+    "1. Go to https://console.firebase.google.com",
+    "2. Create a new project (or use existing)",
+    "3. Add Android app with package name: com.uitars.aistudio",
+    "4. Download google-services.json",
+    "5. Rename this file to google-services.json and replace contents",
+    "6. In Firebase Console: Enable Authentication (Email/Password + Google Sign-In)",
+    "7. In Firebase Console: Enable Firestore Database",
+    "8. Update WEB_CLIENT_ID in LoginScreen.kt with your Firebase Web Client ID"
+  ],
+  "project_info": {
+    "project_number": "YOUR_PROJECT_NUMBER",
+    "project_id": "YOUR_PROJECT_ID",
+    "storage_bucket": "YOUR_PROJECT_ID.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "YOUR_MOBILESDK_APP_ID",
+        "android_client_info": {
+          "package_name": "com.uitars.aistudio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "YOUR_CLIENT_ID.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "YOUR_ANDROID_API_KEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
