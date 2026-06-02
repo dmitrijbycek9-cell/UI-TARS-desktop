@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createHashRouter } from 'react-router-dom';
 import App from '@/App';
 import DiaryPage from '@/pages/DiaryPage';
 import ScannerPage from '@/pages/ScannerPage';
@@ -9,7 +9,9 @@ import RecipeDetailPage from '@/pages/RecipeDetailPage';
 import FitnessPage from '@/pages/FitnessPage';
 import ProfilePage from '@/pages/ProfilePage';
 
-export const router = createBrowserRouter([
+// HashRouter, damit die App auch unter einer Unteradresse (z. B. GitHub Pages)
+// und beim Neuladen ohne Server-Konfiguration zuverlässig funktioniert.
+export const router = createHashRouter([
   {
     path: '/',
     element: <App />,

@@ -4,7 +4,10 @@ import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  // Relativer Pfad beim Build, damit die App auch unter einer Unteradresse
+  // (z. B. https://user.github.io/Repo/) ohne Anpassung läuft.
+  base: command === 'build' ? './' : '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -16,6 +19,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/favicon.svg', 'icons/apple-touch-icon.png'],
       manifest: {
+        scope: './',
+        start_url: './',
+        id: './',
         name: 'Ernährungs-Tagebuch',
         short_name: 'Diät',
         description:
@@ -26,8 +32,6 @@ export default defineConfig({
         orientation: 'portrait',
         background_color: '#0f172a',
         theme_color: '#16a34a',
-        start_url: '/',
-        scope: '/',
         icons: [
           { src: 'icons/pwa-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icons/pwa-512.png', sizes: '512x512', type: 'image/png' },
@@ -71,4 +75,4 @@ export default defineConfig({
     port: 5173,
     host: true,
   },
-});
+}));
