@@ -5,55 +5,45 @@ export function useDietDiary() {
   const store = useDietDiaryStore();
   const {
     selectedDate,
-    entries,
+    day,
     loading,
-    loadEntries,
+    macroTargets,
+    loadDay,
     addEntry,
-    deleteEntry,
+    removeEntry,
+    setWater,
     setSelectedDate,
   } = store;
 
   useEffect(() => {
-    loadEntries(selectedDate);
+    loadDay(selectedDate);
   }, [selectedDate]);
 
-  const totalCalories = entries.reduce(
-    (sum, e) => sum + (e.calories * e.quantity) / 100,
-    0,
-  );
-  const totalProtein = entries.reduce(
-    (sum, e) => sum + ((e.protein ?? 0) * e.quantity) / 100,
-    0,
-  );
-  const totalCarbs = entries.reduce(
-    (sum, e) => sum + ((e.carbs ?? 0) * e.quantity) / 100,
-    0,
-  );
-  const totalFat = entries.reduce(
-    (sum, e) => sum + ((e.fat ?? 0) * e.quantity) / 100,
-    0,
-  );
+  const allEntries = (
+    Object.values(day.meals) as (typeof day.meals)[MealType][]
+  ).flat();
 
-  const byMeal = entries.reduce<Record<MealType, typeof entries>>(
-    (acc, entry) => {
-      if (!acc[entry.meal]) acc[entry.meal] = [];
-      acc[entry.meal].push(entry);
-      return acc;
-    },
-    { breakfast: [], lunch: [], dinner: [], snack: [] },
+  const totals = allEntries.reduce(
+    (acc, e) => ({
+      cal: acc.cal + e.cal,
+      p: acc.p + e.p,
+      k: acc.k + e.k,
+      f: acc.f + e.f,
+    }),
+    { cal: 0, p: 0, k: 0, f: 0 },
   );
 
   return {
     selectedDate,
-    entries,
+    day,
     loading,
-    byMeal,
-    totalCalories,
-    totalProtein,
-    totalCarbs,
-    totalFat,
+    macroTargets,
+    totals,
+    byMeal: day.meals,
+    water: day.water,
     setSelectedDate,
     addEntry,
-    deleteEntry,
+    removeEntry,
+    setWater,
   };
 }

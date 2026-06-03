@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import dayjs from 'dayjs';
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,62 +9,91 @@ import {
 import { toast } from 'sonner';
 import { Button } from '@renderer/components/ui/button';
 import { Card, CardContent } from '@renderer/components/ui/card';
-import { Separator } from '@renderer/components/ui/separator';
 import { BarcodeScanner } from '@renderer/components/DietDiary/BarcodeScanner';
-import { FoodSearch } from '@renderer/components/DietDiary/FoodSearch';
-import { FoodEntryForm } from '@renderer/components/DietDiary/FoodEntryForm';
+import { FoodModal } from '@renderer/components/DietDiary/FoodModal';
 import { MealSection } from '@renderer/components/DietDiary/MealSection';
+import { MacroBar } from '@renderer/components/DietDiary/MacroBar';
+import { WaterTracker } from '@renderer/components/DietDiary/WaterTracker';
 import { useDietDiary } from '@renderer/hooks/useDietDiary';
-import {
-  fetchProductByBarcode,
-  type ProductInfo,
-} from '@renderer/services/openFoodFacts';
-import type { FoodEntry, MealType } from '@renderer/store/dietDiary';
-
-const TODAY = dayjs().format('YYYY-MM-DD');
+import { fetchProductByBarcode } from '@renderer/services/openFoodFacts';
+import type { FoodEntry, MealType } from '@renderer/db/dietDiary';
 
 const MEAL_ORDER: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
+const ACCENT = '#22c55e';
+
+function todayStr(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function shiftDate(str: string, n: number): string {
+  const d = new Date(str + 'T00:00:00');
+  d.setDate(d.getDate() + n);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function formatDate(str: string): string {
+  const today = todayStr();
+  if (str === today) return 'Heute';
+  if (str === shiftDate(today, -1)) return 'Gestern';
+  const d = new Date(str + 'T00:00:00');
+  const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+  const months = [
+    'Jan',
+    'Feb',
+    'Mär',
+    'Apr',
+    'Mai',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Okt',
+    'Nov',
+    'Dez',
+  ];
+  return `${days[d.getDay()]}, ${d.getDate()}. ${months[d.getMonth()]}`;
+}
 
 export default function DietDiaryPage() {
   const {
     selectedDate,
     byMeal,
-    entries,
     loading,
-    totalCalories,
-    totalProtein,
-    totalCarbs,
-    totalFat,
+    totals,
+    macroTargets,
+    water,
     setSelectedDate,
     addEntry,
-    deleteEntry,
+    removeEntry,
+    setWater,
   } = useDietDiary();
 
   const [scannerOpen, setScannerOpen] = useState(false);
-  const [entryFormOpen, setEntryFormOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<ProductInfo | null>(
-    null,
-  );
+  const [modalOpen, setModalOpen] = useState(false);
+  const [defaultMeal, setDefaultMeal] = useState<MealType>('breakfast');
   const [scanning, setScanning] = useState(false);
+  const [prefill, setPrefill] = useState<{
+    name: string;
+    cal: number;
+    p: number;
+    k: number;
+    f: number;
+  } | null>(null);
 
+  const TODAY = todayStr();
   const isToday = selectedDate === TODAY;
-  const displayDate = isToday
-    ? 'Heute'
-    : dayjs(selectedDate).format('DD.MM.YYYY');
 
-  const goToPrev = () =>
-    setSelectedDate(
-      dayjs(selectedDate).subtract(1, 'day').format('YYYY-MM-DD'),
-    );
+  const goToPrev = () => setSelectedDate(shiftDate(selectedDate, -1));
   const goToNext = () => {
-    const next = dayjs(selectedDate).add(1, 'day').format('YYYY-MM-DD');
+    const next = shiftDate(selectedDate, 1);
     if (next <= TODAY) setSelectedDate(next);
   };
-  const goToToday = () => setSelectedDate(TODAY);
 
-  const openEntryForm = (product: ProductInfo) => {
-    setSelectedProduct(product);
-    setEntryFormOpen(true);
+  const openModal = (meal: MealType) => {
+    setDefaultMeal(meal);
+    setPrefill(null);
+    setModalOpen(true);
   };
 
   const handleBarcodeScanned = async (barcode: string) => {
@@ -74,7 +102,15 @@ export default function DietDiaryPage() {
     try {
       const product = await fetchProductByBarcode(barcode);
       if (product) {
-        openEntryForm(product);
+        setPrefill({
+          name: product.name,
+          cal: product.caloriesPer100g ?? 0,
+          p: product.proteinPer100g ?? 0,
+          k: product.carbsPer100g ?? 0,
+          f: product.fatPer100g ?? 0,
+        });
+        setDefaultMeal('breakfast');
+        setModalOpen(true);
       } else {
         toast.error(`Produkt für Barcode „${barcode}" nicht gefunden`);
       }
@@ -85,12 +121,12 @@ export default function DietDiaryPage() {
     }
   };
 
-  const handleAddEntry = (entry: Omit<FoodEntry, 'id' | 'addedAt'>) => {
-    addEntry(entry);
-    toast.success(`„${entry.productName}" hinzugefügt`);
+  const handleAdd = (entry: Omit<FoodEntry, 'id'>, meal: MealType) => {
+    addEntry(meal, entry);
+    toast.success(`„${entry.name}" hinzugefügt`);
   };
 
-  const hasMacros = totalProtein > 0 || totalCarbs > 0 || totalFat > 0;
+  const totalEntries = MEAL_ORDER.reduce((n, m) => n + byMeal[m].length, 0);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -101,6 +137,16 @@ export default function DietDiaryPage() {
             <UtensilsCrossed className="h-5 w-5" />
             Diät-Tagebuch
           </h1>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setScannerOpen(true)}
+            disabled={scanning}
+            title="Barcode scannen"
+          >
+            <ScanBarcode className="h-4 w-4" />
+          </Button>
         </div>
 
         {/* Date navigation */}
@@ -114,7 +160,7 @@ export default function DietDiaryPage() {
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <div className="flex-1 text-center">
-            <p className="text-sm font-medium">{displayDate}</p>
+            <p className="text-sm font-medium">{formatDate(selectedDate)}</p>
           </div>
           <Button
             variant="ghost"
@@ -130,7 +176,7 @@ export default function DietDiaryPage() {
               variant="outline"
               size="sm"
               className="h-8 text-xs gap-1"
-              onClick={goToToday}
+              onClick={() => setSelectedDate(TODAY)}
             >
               <CalendarDays className="h-3 w-3" />
               Heute
@@ -144,74 +190,64 @@ export default function DietDiaryPage() {
         {/* Summary card */}
         <Card>
           <CardContent className="p-4">
-            <div className="text-center">
-              <p className="text-3xl font-bold">{Math.round(totalCalories)}</p>
-              <p className="text-sm text-muted-foreground">kcal heute</p>
+            <div className="text-center mb-4">
+              <p className="text-4xl font-bold" style={{ color: ACCENT }}>
+                {Math.round(totals.cal)}
+              </p>
+              <p className="text-sm text-muted-foreground">kcal</p>
             </div>
-            {hasMacros && (
-              <>
-                <Separator className="my-3" />
-                <div className="grid grid-cols-3 gap-2 text-center text-sm">
-                  <div>
-                    <p className="font-semibold">{Math.round(totalProtein)}g</p>
-                    <p className="text-xs text-muted-foreground">Protein</p>
-                  </div>
-                  <div>
-                    <p className="font-semibold">{Math.round(totalCarbs)}g</p>
-                    <p className="text-xs text-muted-foreground">
-                      Kohlenhydrate
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-semibold">{Math.round(totalFat)}g</p>
-                    <p className="text-xs text-muted-foreground">Fett</p>
-                  </div>
-                </div>
-              </>
-            )}
+            <MacroBar
+              label="Protein"
+              value={totals.p}
+              target={macroTargets.p}
+              color="#3b82f6"
+            />
+            <MacroBar
+              label="Kohlenhydrate"
+              value={totals.k}
+              target={macroTargets.k}
+              color="#f97316"
+            />
+            <MacroBar
+              label="Fett"
+              value={totals.f}
+              target={macroTargets.f}
+              color="#eab308"
+            />
           </CardContent>
         </Card>
 
-        {/* Add food row */}
-        <div className="flex gap-2">
-          <FoodSearch onSelect={openEntryForm} />
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={() => setScannerOpen(true)}
-            disabled={scanning}
-            title="Barcode scannen"
-          >
-            <ScanBarcode className="h-4 w-4" />
-          </Button>
-        </div>
+        {/* Water tracker */}
+        <WaterTracker count={water} onSet={setWater} accent={ACCENT} />
 
         {/* Meal sections */}
         {loading ? (
           <div className="text-center text-sm text-muted-foreground py-8">
-            Laden...
+            Laden…
           </div>
-        ) : entries.length === 0 ? (
-          <div className="text-center text-muted-foreground py-12 space-y-2">
-            <UtensilsCrossed className="h-10 w-10 mx-auto opacity-30" />
-            <p className="text-sm">Noch keine Einträge für diesen Tag.</p>
-            <p className="text-xs">
-              Suche nach Lebensmitteln oder scanne einen Barcode.
-            </p>
+        ) : totalEntries === 0 ? (
+          <div className="space-y-3">
+            {MEAL_ORDER.map((meal) => (
+              <MealSection
+                key={meal}
+                meal={meal}
+                entries={[]}
+                onDelete={removeEntry}
+                onAdd={openModal}
+              />
+            ))}
           </div>
         ) : (
           <div className="space-y-3">
-            {MEAL_ORDER.map((meal) =>
-              byMeal[meal].length > 0 ? (
-                <MealSection
-                  key={meal}
-                  meal={meal}
-                  entries={byMeal[meal]}
-                  onDelete={deleteEntry}
-                />
-              ) : null,
-            )}
+            {MEAL_ORDER.map((meal) => (
+              <MealSection
+                key={meal}
+                meal={meal}
+                entries={byMeal[meal]}
+                onDelete={removeEntry}
+                onAdd={openModal}
+              />
+            ))}
           </div>
         )}
       </div>
@@ -223,15 +259,15 @@ export default function DietDiaryPage() {
         onClose={() => setScannerOpen(false)}
       />
 
-      <FoodEntryForm
-        product={selectedProduct}
-        open={entryFormOpen}
+      <FoodModal
+        open={modalOpen}
         onClose={() => {
-          setEntryFormOpen(false);
-          setSelectedProduct(null);
+          setModalOpen(false);
+          setPrefill(null);
         }}
-        onSubmit={handleAddEntry}
-        date={selectedDate}
+        onAdd={handleAdd}
+        defaultMeal={defaultMeal}
+        prefill={prefill}
       />
     </div>
   );
