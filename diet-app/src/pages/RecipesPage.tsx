@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { clsx } from 'clsx';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { Card, EmptyState } from '@/components/ui';
+import { Card, EmptyState, Input } from '@/components/ui';
 import { t } from '@/i18n/de';
 import { db } from '@/db/db';
+import { RECIPE_CATEGORIES } from '@/data/cookbook';
 import { recipePerServing } from '@/lib/nutrition';
 import { suggestRecipes } from '@/lib/suggestions';
 import { useProfileStore } from '@/stores/useProfileStore';
@@ -30,14 +31,14 @@ export default function RecipesPage() {
         action={
           <Link
             to="/rezepte/neu"
-            className="rounded-xl bg-brand-600 px-3 py-2 text-sm font-semibold text-white"
+            className="rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 px-3 py-2 text-sm font-semibold text-white shadow-lg shadow-brand-600/25"
           >
-            + {t.recipes.newRecipe}
+            + Neu
           </Link>
         }
       />
       <div className="p-4">
-        <div className="mb-4 flex rounded-xl bg-slate-200 p-1 text-sm font-medium">
+        <div className="mb-4 flex rounded-2xl bg-slate-200/70 p-1 text-sm font-semibold">
           <TabBtn active={tab === 'cookbook'} onClick={() => setTab('cookbook')}>
             {t.recipes.cookbook}
           </TabBtn>
@@ -72,7 +73,7 @@ function TabBtn({
     <button
       onClick={onClick}
       className={clsx(
-        'flex-1 rounded-lg py-1.5 transition',
+        'flex-1 rounded-xl py-2 transition',
         active ? 'bg-white text-brand-700 shadow-sm' : 'text-slate-500',
       )}
     >
@@ -82,32 +83,62 @@ function TabBtn({
 }
 
 function Cookbook({ recipes }: { recipes: Recipe[] }) {
-  const grouped = useMemo(() => {
-    const map = new Map<string, Recipe[]>();
-    for (const r of recipes) {
-      const letter = r.name[0]?.toUpperCase() ?? '#';
-      if (!map.has(letter)) map.set(letter, []);
-      map.get(letter)!.push(r);
-    }
-    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b, 'de'));
+  const [query, setQuery] = useState('');
+  const [cat, setCat] = useState<string>('all');
+
+  const categories = useMemo(() => {
+    const fromData = new Set<string>(RECIPE_CATEGORIES);
+    recipes.forEach((r) => r.category && fromData.add(r.category));
+    return ['all', ...fromData];
   }, [recipes]);
 
-  if (recipes.length === 0) {
-    return <EmptyState icon="🍳" title={t.common.none} />;
-  }
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return recipes.filter((r) => {
+      const matchCat = cat === 'all' || r.category === cat;
+      const matchQuery =
+        !q ||
+        r.name.toLowerCase().includes(q) ||
+        r.tags?.some((tag) => tag.toLowerCase().includes(q));
+      return matchCat && matchQuery;
+    });
+  }, [recipes, query, cat]);
 
   return (
-    <div className="space-y-5">
-      {grouped.map(([letter, items]) => (
-        <div key={letter}>
-          <h2 className="mb-2 text-sm font-bold text-brand-600">{letter}</h2>
-          <div className="space-y-2">
-            {items.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} />
-            ))}
-          </div>
+    <div>
+      <div className="mb-3">
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t.recipes.search}
+        />
+      </div>
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
+        {categories.map((c) => (
+          <button
+            key={c}
+            onClick={() => setCat(c)}
+            className={clsx(
+              'whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium transition',
+              cat === c
+                ? 'bg-brand-600 text-white'
+                : 'bg-white text-slate-600 ring-1 ring-slate-200',
+            )}
+          >
+            {c === 'all' ? t.recipes.all : c}
+          </button>
+        ))}
+      </div>
+
+      {filtered.length === 0 ? (
+        <EmptyState icon="🍳" title={t.recipes.noResults} />
+      ) : (
+        <div className="space-y-2.5">
+          {filtered.map((recipe) => (
+            <RecipeCard key={recipe.id} recipe={recipe} />
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 }
@@ -142,7 +173,7 @@ function Suggestions({ recipes }: { recipes: Recipe[] }) {
       {suggestions.length === 0 ? (
         <EmptyState icon="🍽️" title={t.recipes.noSuggestions} />
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {suggestions.map((s) => (
             <RecipeCard
               key={s.recipe.id}
@@ -165,27 +196,32 @@ function RecipeCard({
 }) {
   const kcal = kcalOverride ?? Math.round(recipePerServing(recipe).kcal);
   return (
-    <Link to={`/rezepte/${recipe.id}`}>
-      <Card className="flex items-center justify-between gap-3 transition hover:ring-brand-200">
-        <div className="min-w-0">
+    <Link to={`/rezepte/${recipe.id}`} className="block">
+      <Card className="flex items-center gap-3 !p-3 transition active:scale-[0.99]">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-brand-100 to-emerald-50 text-3xl ring-1 ring-brand-100">
+          {recipe.imageUrl ? (
+            <img
+              src={recipe.imageUrl}
+              alt=""
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <span>{recipe.emoji ?? '🍽️'}</span>
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <p className="truncate font-semibold text-slate-800">
-              {recipe.name}
-            </p>
-            {recipe.isSeed && (
-              <span className="shrink-0 rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-medium text-brand-600">
-                {t.recipes.seedBadge}
-              </span>
-            )}
+            <p className="truncate font-bold text-slate-800">{recipe.name}</p>
+            {recipe.videoUrl && <span title="Koch-Video">🎬</span>}
           </div>
-          {recipe.description && (
-            <p className="truncate text-xs text-slate-400">
-              {recipe.description}
+          {recipe.category && (
+            <p className="text-xs font-medium text-brand-600">
+              {recipe.category}
             </p>
           )}
           {recipe.tags && recipe.tags.length > 0 && (
             <div className="mt-1 flex flex-wrap gap-1">
-              {recipe.tags.map((tag) => (
+              {recipe.tags.slice(0, 3).map((tag) => (
                 <span
                   key={tag}
                   className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-500"
@@ -197,8 +233,8 @@ function RecipeCard({
           )}
         </div>
         <div className="shrink-0 text-right">
-          <p className="font-bold text-brand-600">{kcal}</p>
-          <p className="text-[10px] text-slate-400">kcal/{t.common.portion}</p>
+          <p className="text-lg font-extrabold text-brand-600">{kcal}</p>
+          <p className="text-[10px] text-slate-400">kcal/Port.</p>
         </div>
       </Card>
     </Link>

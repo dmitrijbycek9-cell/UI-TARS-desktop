@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button, Card, Field, Input, Spinner } from '@/components/ui';
 import { t } from '@/i18n/de';
@@ -13,12 +13,15 @@ const BarcodeScanner = lazy(() =>
 
 export default function ScannerPage() {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const meal = params.get('meal');
+  const mealSuffix = meal ? `?meal=${encodeURIComponent(meal)}` : '';
   const [error, setError] = useState<string | null>(null);
   const [scanning, setScanning] = useState(true);
   const [manualCode, setManualCode] = useState('');
 
   function handleDetected(barcode: string) {
-    navigate(`/product/${encodeURIComponent(barcode)}`);
+    navigate(`/product/${encodeURIComponent(barcode)}${mealSuffix}`);
   }
 
   function handleError(message: string) {
@@ -28,7 +31,7 @@ export default function ScannerPage() {
 
   function lookupManual() {
     const code = manualCode.trim();
-    if (code) navigate(`/product/${encodeURIComponent(code)}`);
+    if (code) navigate(`/product/${encodeURIComponent(code)}${mealSuffix}`);
   }
 
   return (

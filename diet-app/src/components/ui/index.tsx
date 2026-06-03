@@ -16,8 +16,9 @@ export function Button({
   return (
     <button
       className={clsx(
-        'inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50',
-        variant === 'primary' && 'bg-brand-600 text-white hover:bg-brand-700',
+        'inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50',
+        variant === 'primary' &&
+          'bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-lg shadow-brand-600/25 hover:from-brand-600 hover:to-brand-700',
         variant === 'secondary' &&
           'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50',
         variant === 'ghost' && 'text-slate-600 hover:bg-slate-100',
@@ -39,7 +40,7 @@ export function Card({
   return (
     <div
       className={clsx(
-        'rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100',
+        'rounded-3xl bg-white/90 p-4 shadow-[0_8px_30px_-12px_rgba(15,23,42,0.15)] ring-1 ring-slate-200/60 backdrop-blur-sm',
         className,
       )}
     >

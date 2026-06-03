@@ -302,17 +302,69 @@ const SEED_DEFS: SeedDef[] = [
   },
 ];
 
+// Passende Symbole je Gericht (Bild-Platzhalter, offline & schnell)
+const EMOJI_BY_ID: Record<string, string> = {
+  'seed-apfel-haferbrei': '🥣',
+  'seed-beeren-quark': '🫐',
+  'seed-couscous-salat': '🥗',
+  'seed-dal-linsen': '🍲',
+  'seed-eieromelett': '🍳',
+  'seed-feta-salat': '🥗',
+  'seed-gemuese-curry': '🍛',
+  'seed-haehnchen-reis': '🍗',
+  'seed-italienische-pasta': '🍝',
+  'seed-joghurt-bowl': '🥣',
+  'seed-kartoffel-spinat': '🥔',
+  'seed-lachs-quinoa': '🐟',
+  'seed-mediterrane-bowl': '🥙',
+  'seed-nudelsalat': '🥗',
+  'seed-omelett-schinken': '🍳',
+  'seed-pfannkuchen': '🥞',
+  'seed-quinoa-salat': '🥑',
+  'seed-rind-bohnen-chili': '🌶️',
+  'seed-spaghetti-bolognese': '🍝',
+  'seed-thunfisch-salat': '🥗',
+  'seed-ueberbackene-kartoffeln': '🧀',
+  'seed-vollkornbrot-avocado': '🥑',
+  'seed-wok-gemuese': '🥘',
+  'seed-xxl-fitness-bowl': '💪',
+  'seed-yufka-haehnchen': '🌯',
+  'seed-zucchini-pasta': '🍝',
+};
+
+const CATEGORY_EMOJI: Record<string, string> = {
+  Frühstück: '🥣',
+  Salate: '🥗',
+  Bowls: '🥙',
+  Hauptgerichte: '🍽️',
+  Eintöpfe: '🍲',
+};
+
+/** Link zu Koch-Videos: YouTube-Suche zum Gericht (immer aktuell verfügbar). */
+function cookingVideoUrl(name: string): string {
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(
+    name + ' Rezept',
+  )}`;
+}
+
 export const COOKBOOK: Recipe[] = SEED_DEFS.map((def) => ({
   id: def.id,
   name: def.name,
   category: def.category,
   description: def.description,
   tags: def.tags,
+  emoji: EMOJI_BY_ID[def.id] ?? CATEGORY_EMOJI[def.category] ?? '🍽️',
+  videoUrl: cookingVideoUrl(def.name),
   servings: def.servings,
   isSeed: true,
   createdAt: 0,
   ingredients: def.ingredients.map(([name, amount]) => ing(name, amount)),
 }));
+
+/** Alle Rezept-Kategorien (für Filter-Chips). */
+export const RECIPE_CATEGORIES = [
+  ...new Set(SEED_DEFS.map((d) => d.category)),
+];
 
 /** Häufige Einzel-Lebensmittel für die manuelle Schnell-Erfassung & Zutatensuche. */
 export const COMMON_FOODS = Object.entries(FOODS).map(([name, per100g]) => ({

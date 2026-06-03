@@ -36,6 +36,7 @@ export interface DiaryEntry {
   refId?: string; // barcode oder recipeId
   amountG: number;
   nutrients: Nutrients; // absolute Werte für diesen Eintrag
+  photo?: string; // optionales Foto als Data-URL
   createdAt: number;
 }
 
@@ -53,10 +54,23 @@ export interface Recipe {
   category?: string;
   description?: string;
   tags?: string[];
+  emoji?: string; // Symbol als Bild-Platzhalter
+  imageUrl?: string; // optionales Foto (Data-URL oder Web-Link)
+  videoUrl?: string; // Link zum Koch-Video (z. B. YouTube)
   ingredients: Ingredient[];
   servings: number;
   isSeed?: boolean;
   createdAt: number;
+}
+
+export interface Exercise {
+  id: string;
+  name: string;
+  category: 'Yoga' | 'Pilates' | 'Dehnen' | 'Kraft';
+  emoji: string;
+  durationSec: number;
+  description: string;
+  met: number; // für Kalorienschätzung
 }
 
 export type Sex = 'male' | 'female';

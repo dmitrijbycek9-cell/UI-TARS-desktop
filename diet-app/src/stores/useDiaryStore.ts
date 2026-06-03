@@ -18,6 +18,7 @@ interface AddEntryArgs {
   refId?: string;
   amountG: number;
   nutrients: Nutrients;
+  photo?: string;
 }
 
 interface DiaryState {

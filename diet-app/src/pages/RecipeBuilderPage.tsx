@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { IngredientPicker } from '@/components/recipe/IngredientPicker';
 import { NutritionTable } from '@/components/recipe/NutritionTable';
 import { Button, Card, EmptyState, Field, Input } from '@/components/ui';
+import { fileToCompressedDataUrl } from '@/lib/image';
 import { t } from '@/i18n/de';
 import {
   recipePerServing,
@@ -21,6 +22,9 @@ export default function RecipeBuilderPage() {
 
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
+  const [emoji, setEmoji] = useState('🍽️');
+  const [videoUrl, setVideoUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
   const [servings, setServings] = useState(2);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
@@ -32,6 +36,16 @@ export default function RecipeBuilderPage() {
     ingredients,
     createdAt: 0,
   };
+
+  async function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setImageUrl(await fileToCompressedDataUrl(file));
+    } catch {
+      showToast('Foto konnte nicht geladen werden.', 'error');
+    }
+  }
 
   function addIngredient(ing: Ingredient) {
     setIngredients((prev) => [...prev, ing]);
@@ -54,6 +68,9 @@ export default function RecipeBuilderPage() {
       id: crypto.randomUUID(),
       name: name.trim(),
       category: category.trim() || undefined,
+      emoji: emoji.trim() || '🍽️',
+      videoUrl: videoUrl.trim() || undefined,
+      imageUrl,
       servings: Math.max(1, servings),
       ingredients,
       createdAt: Date.now(),
@@ -76,6 +93,7 @@ export default function RecipeBuilderPage() {
               <Input
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
+                placeholder="z. B. Hauptgerichte"
               />
             </Field>
             <Field label={t.common.servings}>
@@ -86,7 +104,36 @@ export default function RecipeBuilderPage() {
                 onChange={(e) => setServings(Number(e.target.value))}
               />
             </Field>
+            <Field label={t.recipes.emoji}>
+              <Input
+                value={emoji}
+                onChange={(e) => setEmoji(e.target.value)}
+                maxLength={4}
+              />
+            </Field>
+            <div>
+              <span className="mb-1 block text-sm font-medium text-slate-600">
+                {t.recipes.photo}
+              </span>
+              <label className="flex cursor-pointer items-center gap-2 rounded-2xl bg-slate-100 px-3 py-2.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-200">
+                📷 {imageUrl ? '✓' : t.recipes.photoAdd}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handlePhoto}
+                />
+              </label>
+            </div>
           </div>
+          <Field label={`${t.recipes.videoUrl} (${t.common.optional})`}>
+            <Input
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+              placeholder="https://youtube.com/..."
+              inputMode="url"
+            />
+          </Field>
         </Card>
 
         <Card>

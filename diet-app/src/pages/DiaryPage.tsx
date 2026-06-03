@@ -1,10 +1,11 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { DateSwitcher } from '@/components/diary/DateSwitcher';
 import { DailyTotalsBar } from '@/components/diary/DailyTotalsBar';
 import { AddEntryModal } from '@/components/diary/AddEntryModal';
-import { Button, Card } from '@/components/ui';
+import { Card } from '@/components/ui';
 import { t } from '@/i18n/de';
 import { db } from '@/db/db';
 import { useUiStore } from '@/stores/useUiStore';
@@ -69,7 +70,14 @@ export default function DiaryPage() {
                       key={entry.id}
                       className="flex items-center justify-between gap-2 py-2"
                     >
-                      <div className="min-w-0">
+                      {entry.photo && (
+                        <img
+                          src={entry.photo}
+                          alt=""
+                          className="h-10 w-10 shrink-0 rounded-xl object-cover ring-1 ring-slate-200"
+                        />
+                      )}
+                      <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-slate-700">
                           {entry.label}
                         </p>
@@ -96,13 +104,20 @@ export default function DiaryPage() {
                 </ul>
               )}
 
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-brand-600"
-                onClick={() => setModalMeal(meal)}
-              >
-                + {t.common.add}
-              </Button>
+              <div className="flex gap-2 pt-1">
+                <Link
+                  to={`/scan?meal=${meal}`}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-brand-50 py-2.5 text-sm font-semibold text-brand-700 ring-1 ring-brand-100 active:scale-[0.98]"
+                >
+                  📷 {t.diary.scan}
+                </Link>
+                <button
+                  onClick={() => setModalMeal(meal)}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-slate-100 py-2.5 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 active:scale-[0.98]"
+                >
+                  ✏️ {t.diary.entry}
+                </button>
+              </div>
             </Card>
           );
         })}

@@ -70,11 +70,36 @@ export default function RecipeDetailPage() {
     <div>
       <PageHeader title={recipe.name} back subtitle={recipe.category} />
       <div className="space-y-4 p-4">
-        {recipe.description && (
-          <Card>
-            <p className="text-sm text-slate-600">{recipe.description}</p>
-          </Card>
-        )}
+        <Card className="!p-0 overflow-hidden">
+          <div className="flex h-40 w-full items-center justify-center bg-gradient-to-br from-brand-100 to-emerald-50 text-7xl">
+            {recipe.imageUrl ? (
+              <img
+                src={recipe.imageUrl}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span>{recipe.emoji ?? '🍽️'}</span>
+            )}
+          </div>
+          {(recipe.description || recipe.videoUrl) && (
+            <div className="space-y-3 p-4">
+              {recipe.description && (
+                <p className="text-sm text-slate-600">{recipe.description}</p>
+              )}
+              {recipe.videoUrl && (
+                <a
+                  href={recipe.videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 ring-1 ring-red-100"
+                >
+                  🎬 {t.recipes.watchVideo}
+                </a>
+              )}
+            </div>
+          )}
+        </Card>
 
         <Card>
           <h2 className="mb-2 font-semibold text-slate-700">

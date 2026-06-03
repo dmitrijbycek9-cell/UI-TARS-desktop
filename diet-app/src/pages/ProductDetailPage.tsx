@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { NutritionTable } from '@/components/recipe/NutritionTable';
 import { ManualEntryForm } from '@/components/scanner/ManualEntryForm';
@@ -25,10 +25,15 @@ export default function ProductDetailPage() {
   const selectedDate = useUiStore((s) => s.selectedDate);
   const showToast = useUiStore((s) => s.showToast);
 
+  const [params] = useSearchParams();
+  const initialMeal = (params.get('meal') as MealType) || 'snack';
+
   const [status, setStatus] = useState<Status>('loading');
   const [product, setProduct] = useState<Product | null>(null);
   const [grams, setGrams] = useState(100);
-  const [meal, setMeal] = useState<MealType>('snack');
+  const [meal, setMeal] = useState<MealType>(
+    MEALS.includes(initialMeal) ? initialMeal : 'snack',
+  );
 
   useEffect(() => {
     let active = true;

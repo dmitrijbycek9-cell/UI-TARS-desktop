@@ -3,6 +3,7 @@ import { Button, Field, Input, Modal, Select } from '@/components/ui';
 import { t } from '@/i18n/de';
 import { COMMON_FOODS } from '@/data/cookbook';
 import { scaleNutrients } from '@/lib/nutrition';
+import { fileToCompressedDataUrl } from '@/lib/image';
 import { useDiaryStore } from '@/stores/useDiaryStore';
 import { useUiStore } from '@/stores/useUiStore';
 import type { MealType, Nutrients } from '@/types';
@@ -27,12 +28,23 @@ export function AddEntryModal({
   const [query, setQuery] = useState('');
   const [name, setName] = useState('');
   const [grams, setGrams] = useState(100);
+  const [photo, setPhoto] = useState<string | undefined>(undefined);
   const [per100g, setPer100g] = useState<Nutrients>({
     kcal: 0,
     carbs: 0,
     protein: 0,
     fat: 0,
   });
+
+  async function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setPhoto(await fileToCompressedDataUrl(file));
+    } catch {
+      showToast('Foto konnte nicht geladen werden.', 'error');
+    }
+  }
 
   const matches = useMemo(() => {
     if (!query.trim()) return [];
@@ -67,12 +79,14 @@ export function AddEntryModal({
       source: 'manual',
       amountG: grams,
       nutrients: preview,
+      photo,
     });
     showToast(t.product.saved);
     onClose();
     // Felder zurücksetzen
     setName('');
     setGrams(100);
+    setPhoto(undefined);
     setPer100g({ kcal: 0, carbs: 0, protein: 0, fat: 0 });
   }
 
@@ -163,6 +177,31 @@ export function AddEntryModal({
             onChange={(e) => setGrams(Number(e.target.value))}
           />
         </Field>
+
+        <div>
+          <span className="mb-1 block text-sm font-medium text-slate-600">
+            {t.diary.photo} ({t.common.optional})
+          </span>
+          <div className="flex items-center gap-3">
+            <label className="flex cursor-pointer items-center gap-2 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50">
+              📷 {photo ? t.diary.photoChange : t.diary.photoAdd}
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={handlePhoto}
+              />
+            </label>
+            {photo && (
+              <img
+                src={photo}
+                alt=""
+                className="h-12 w-12 rounded-xl object-cover ring-1 ring-slate-200"
+              />
+            )}
+          </div>
+        </div>
 
         <div className="rounded-xl bg-slate-50 px-4 py-3 text-center text-sm text-slate-600">
           Ergibt{' '}

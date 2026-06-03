@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { DateSwitcher } from '@/components/diary/DateSwitcher';
 import { StepCounterCard } from '@/components/fitness/StepCounterCard';
+import { ExerciseLibrary } from '@/components/fitness/ExerciseLibrary';
 import { WorkoutForm } from '@/components/fitness/WorkoutForm';
 import { Button, Card, EmptyState } from '@/components/ui';
 import { t } from '@/i18n/de';
@@ -33,6 +34,8 @@ export default function FitnessPage() {
         </Card>
 
         <StepCounterCard dateKey={selectedDate} />
+
+        <ExerciseLibrary dateKey={selectedDate} />
 
         <Card className="space-y-3">
           <div className="flex items-center justify-between">
