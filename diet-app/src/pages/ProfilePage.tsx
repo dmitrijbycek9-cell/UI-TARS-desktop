@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button, Card, Field, Input, Select } from '@/components/ui';
 import { t } from '@/i18n/de';
@@ -6,6 +6,7 @@ import { useProfileStore } from '@/stores/useProfileStore';
 import { useUiStore } from '@/stores/useUiStore';
 import { bmi, bmiCategory, type ProfileInput } from '@/lib/health';
 import type { ActivityLevel, Goal, Sex } from '@/types';
+import { db } from '@/db/db';
 
 const DEFAULTS: ProfileInput = {
   age: 30,
@@ -35,6 +36,7 @@ export default function ProfilePage() {
   const profile = useProfileStore((s) => s.profile);
   const saveProfile = useProfileStore((s) => s.saveProfile);
   const showToast = useUiStore((s) => s.showToast);
+  const [apiKey, setApiKey] = useState('');
 
   const [form, setForm] = useState<ProfileInput>(() =>
     profile
@@ -50,12 +52,21 @@ export default function ProfilePage() {
       : DEFAULTS,
   );
 
+  useEffect(() => {
+    db.settings.get('googleVisionApiKey').then((key) => {
+      if (key?.value) setApiKey(key.value);
+    });
+  }, []);
+
   function update<K extends keyof ProfileInput>(key: K, value: ProfileInput[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
   async function handleSave() {
     await saveProfile(form);
+    if (apiKey.trim()) {
+      await db.settings.put({ id: 'googleVisionApiKey', value: apiKey.trim() });
+    }
     showToast(t.profile.saved);
   }
 
@@ -142,6 +153,31 @@ export default function ProfilePage() {
           <Button className="w-full" onClick={handleSave}>
             {t.profile.save}
           </Button>
+        </Card>
+
+        <Card className="space-y-3">
+          <p className="text-sm font-semibold text-slate-500">
+            {t.gauge.title}
+          </p>
+          <Field label={`Google Vision API-Key (${t.common.optional})`}>
+            <Input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="Gib deinen API-Key ein"
+            />
+          </Field>
+          <p className="text-xs text-slate-500">
+            Erhalte einen kostenlosen Key von{' '}
+            <a
+              href="https://console.cloud.google.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-600 hover:underline"
+            >
+              Google Cloud Console
+            </a>
+          </p>
         </Card>
 
         <Card className="space-y-4">

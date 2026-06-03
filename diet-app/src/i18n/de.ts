@@ -12,6 +12,7 @@ export const t = {
     scan: 'Scannen',
     recipes: 'Rezepte',
     fitness: 'Fitness',
+    gauge: 'Waage',
     profile: 'Profil',
   },
   common: {
@@ -155,6 +156,21 @@ export const t = {
     distance: 'Strecke',
     permissionNeeded:
       'Für den Schrittzähler wird Zugriff auf den Bewegungssensor benötigt.',
+  },
+  gauge: {
+    title: 'Gewicht schätzen',
+    estimating: 'Schätzung läuft ...',
+    takePicture: 'Foto machen',
+    estimatedWeight: 'Geschätztes Gewicht',
+    accuracy: 'Genauigkeit: ±',
+    adjustRange: 'Mit dem Schieber anpassen',
+    copy: 'Kopieren',
+    apiKeyRequired: 'Google Vision API-Key erforderlich',
+    setupInstructions:
+      'Gib deinen Google Vision API-Key in den Profil-Einstellungen ein.',
+    invalidApiKey: 'Ungültiger API-Key',
+    apiError: 'Fehler bei der Gewichtsschätzung',
+    retryWithDifferentPhoto: 'Versuche ein anderes Foto',
   },
   profile: {
     title: 'Körperindex & Profil',

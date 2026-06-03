@@ -7,6 +7,7 @@ const items = [
   { to: '/rezepte', label: t.nav.recipes, icon: '🍳', end: false },
   { to: '/scan', label: t.nav.scan, icon: '📷', end: false, center: true },
   { to: '/fitness', label: t.nav.fitness, icon: '🏃', end: false },
+  { to: '/waage', label: t.nav.gauge, icon: '⚖️', end: false },
   { to: '/profil', label: t.nav.profile, icon: '👤', end: false },
 ];
 

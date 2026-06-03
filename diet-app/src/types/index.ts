@@ -122,3 +122,8 @@ export interface StepRecord {
   caloriesBurned: number;
   updatedAt: number;
 }
+
+export interface Setting {
+  id: string;
+  value: string;
+}
