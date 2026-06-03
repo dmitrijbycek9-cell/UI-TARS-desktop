@@ -84,11 +84,13 @@ export const t = {
   product: {
     title: 'Produkt',
     addToDiary: 'Zum Tagebuch hinzufügen',
-    portionG: 'Portionsgröße (g)',
-    manualTitle: 'Nährwerte eingeben (pro 100 g)',
+    portionG: 'Portionsgröße (g/ml)',
+    manualTitle: 'Nährwerte eingeben (pro 100 g/ml)',
     productName: 'Produktname',
     brand: 'Marke',
     saved: 'Zum Tagebuch hinzugefügt.',
+    noNutrition:
+      'Für dieses Produkt sind in der Datenbank keine Nährwerte hinterlegt. Du kannst sie unten selbst eintragen (z. B. von der Verpackung).',
   },
   recipes: {
     title: 'Rezepte',

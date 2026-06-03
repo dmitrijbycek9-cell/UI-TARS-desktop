@@ -16,7 +16,7 @@ import type { MealType, Product } from '@/types';
 
 const MEALS: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
 
-type Status = 'loading' | 'found' | 'manual';
+type Status = 'loading' | 'found' | 'manual' | 'noData';
 
 export default function ProductDetailPage() {
   const { barcode = '' } = useParams();
@@ -38,7 +38,8 @@ export default function ProductDetailPage() {
         if (!active) return;
         setProduct(p);
         setGrams(p.defaultPortionG ?? 100);
-        setStatus('found');
+        // Produkt gefunden, aber OFF hat keine Nährwerte hinterlegt
+        setStatus(p.hasNutrition === false ? 'noData' : 'found');
       })
       .catch((err) => {
         if (!active) return;
@@ -75,6 +76,32 @@ export default function ProductDetailPage() {
             <p className="mb-4 text-sm text-slate-500">{t.scanner.notFound}</p>
             <ManualEntryForm
               barcode={barcode}
+              onSaved={(p) => {
+                setProduct(p);
+                setGrams(p.defaultPortionG ?? 100);
+                setStatus('found');
+              }}
+            />
+          </Card>
+        )}
+
+        {status === 'noData' && product && (
+          <Card>
+            {product.imageUrl && (
+              <img
+                src={product.imageUrl}
+                alt=""
+                className="mb-3 h-16 w-16 rounded-xl object-cover"
+              />
+            )}
+            <h2 className="font-bold text-slate-900">{product.name}</h2>
+            <p className="mb-4 mt-1 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-700">
+              {t.product.noNutrition}
+            </p>
+            <ManualEntryForm
+              barcode={barcode}
+              initialName={product.name}
+              initialBrand={product.brand}
               onSaved={(p) => {
                 setProduct(p);
                 setGrams(p.defaultPortionG ?? 100);

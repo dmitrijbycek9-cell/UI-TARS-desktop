@@ -8,12 +8,16 @@ import type { Nutrients, Product } from '@/types';
 export function ManualEntryForm({
   barcode,
   onSaved,
+  initialName = '',
+  initialBrand = '',
 }: {
   barcode: string;
   onSaved: (product: Product) => void;
+  initialName?: string;
+  initialBrand?: string;
 }) {
-  const [name, setName] = useState('');
-  const [brand, setBrand] = useState('');
+  const [name, setName] = useState(initialName);
+  const [brand, setBrand] = useState(initialBrand);
   const [per100g, setPer100g] = useState<Nutrients>({
     kcal: 0,
     carbs: 0,

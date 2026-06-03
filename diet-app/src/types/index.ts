@@ -20,6 +20,8 @@ export interface Product {
   per100g: Nutrients;
   defaultPortionG?: number;
   source: 'off' | 'manual';
+  /** false, wenn OFF zum Produkt keine Nährwerte hinterlegt hat. */
+  hasNutrition?: boolean;
   fetchedAt: number;
 }
 
