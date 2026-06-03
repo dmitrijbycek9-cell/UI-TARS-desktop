@@ -19,6 +19,42 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Sicherheitsnetz: macht Startfehler sichtbar statt weißem Bildschirm
+      (function () {
+        var errors = [];
+        function show(msg) {
+          var r = document.getElementById('root');
+          if (r && r.childElementCount === 0) {
+            r.innerHTML =
+              '<div style="padding:20px;font:15px system-ui,sans-serif;color:#334155;line-height:1.5">' +
+              '<b>Die App konnte nicht starten.</b><br><br>' +
+              (msg || 'Unbekannter Fehler.') +
+              '<br><br><span style="color:#94a3b8">Bitte diesen Text an den Entwickler senden.</span></div>';
+          }
+        }
+        window.addEventListener('error', function (e) {
+          errors.push((e.message || 'Fehler') + (e.filename ? ' @ ' + e.filename : ''));
+          show(errors.join('<br>'));
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          var r = e.reason;
+          errors.push('Promise: ' + (r && r.message ? r.message : String(r)));
+          show(errors.join('<br>'));
+        });
+        // Falls nach 5 s nichts gerendert wurde (z. B. blockierte Skript-Datei)
+        setTimeout(function () {
+          var r = document.getElementById('root');
+          if (r && r.childElementCount === 0) {
+            show(
+              errors.length
+                ? errors.join('<br>')
+                : 'Der Server hat die Programmdatei vermutlich mit falschem Dateityp geliefert (MIME), daher wurde sie blockiert. Bitte einen anderen Link/Hoster verwenden.',
+            );
+          }
+        }, 5000);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
