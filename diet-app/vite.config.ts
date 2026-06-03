@@ -1,7 +1,13 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { viteSingleFile } from 'vite-plugin-singlefile';
 import path from 'node:path';
+
+// SINGLEFILE=1 bündelt die gesamte App in eine einzige index.html (JS/CSS
+// eingebettet). Das umgeht MIME-Probleme von Datei-CDNs (raw.githack &amp; Co.),
+// weil keine separate .js-Datei mehr geladen werden muss.
+const singleFile = process.env.SINGLEFILE === '1';
 
 // https://vite.dev/config/
 export default defineConfig(({ command }) => ({
@@ -70,6 +76,7 @@ export default defineConfig(({ command }) => ({
         enabled: false,
       },
     }),
+    ...(singleFile ? [viteSingleFile()] : []),
   ],
   server: {
     port: 5173,
