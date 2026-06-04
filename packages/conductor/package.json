@@ -1,0 +1,39 @@
+{
+  "name": "@conductor/core",
+  "version": "0.1.0",
+  "description": "CONDUCTOR – Orchestration layer connecting Grok xAI reasoning with MNEME memory",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "demo": "tsx src/demo.ts"
+  },
+  "dependencies": {
+    "@mneme/core": "workspace:*",
+    "openai": "4.93.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.8",
+    "tsx": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}
