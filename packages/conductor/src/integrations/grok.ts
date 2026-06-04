@@ -19,6 +19,12 @@ export interface GrokResponse {
   };
 }
 
+export type ChatMessageParam =
+  OpenAI.Chat.Completions.ChatCompletionMessageParam;
+export type ChatTool = OpenAI.Chat.Completions.ChatCompletionTool;
+export type ChatAssistantMessage =
+  OpenAI.Chat.Completions.ChatCompletionMessage;
+
 const GROK_BASE_URL = 'https://api.x.ai/v1';
 const GROK_ENV_KEY = [
   'X',
@@ -80,6 +86,26 @@ export class GrokClient {
         completionTokens: response.usage?.completion_tokens ?? 0,
       },
     };
+  }
+
+  /**
+   * Tool-calling completion. Returns the raw assistant message so callers can
+   * inspect `tool_calls` and drive a tool-execution loop.
+   */
+  async chatWithTools(
+    messages: ChatMessageParam[],
+    tools?: ChatTool[],
+  ): Promise<ChatAssistantMessage> {
+    const response = await this.client.chat.completions.create({
+      model: this.model,
+      messages,
+      ...(tools && tools.length ? { tools } : {}),
+    });
+    const message = response.choices[0]?.message;
+    if (!message) {
+      throw new Error('Empty response from Grok API');
+    }
+    return message;
   }
 
   async embed(text: string): Promise<number[]> {

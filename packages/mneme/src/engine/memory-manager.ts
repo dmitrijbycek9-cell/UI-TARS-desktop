@@ -5,6 +5,7 @@ import { GraphStore } from '../stores/graph-store.js';
 import { TemporalStore } from '../stores/temporal-store.js';
 import { HybridSearch } from '../retrieval/hybrid-search.js';
 import { createProvenance } from './provenance.js';
+import { applyReinforcement, EnergyEvent } from './energy.js';
 import {
   ConfidenceScore,
   EmbeddingFn,
@@ -109,6 +110,63 @@ export class MemoryManager {
       this.temporalStore.updateAccessed(id);
     }
     return memory;
+  }
+
+  /**
+   * Apply a reinforcement event to a memory's energy (Whitepaper §4.2).
+   * `retrieved`/`cited` also bump the access timestamp.
+   */
+  reinforce(id: string, event: EnergyEvent): void {
+    const memory = this.temporalStore.getById(id);
+    if (!memory) return;
+    this.temporalStore.updateEnergy(
+      id,
+      applyReinforcement(memory.energyScore, event),
+    );
+    if (event === 'retrieved' || event === 'cited') {
+      this.temporalStore.updateAccessed(id);
+    }
+  }
+
+  // --- Forgetting primitives (used by the ForgettingWorker) ---
+
+  /** All active (non-archived) memories, optionally scoped to an agent. */
+  listActive(agentId?: string): MemoryUnit[] {
+    return this.temporalStore.getAll(agentId);
+  }
+
+  /** Overwrite the energy score of an active memory. */
+  setEnergy(id: string, energy: number): void {
+    this.temporalStore.updateEnergy(id, energy);
+  }
+
+  /** Archive a memory into cold storage and drop it from active indexes. */
+  archive(id: string): void {
+    this.temporalStore.moveToCold(id);
+    this.vectorStore.delete(id);
+    this.graphStore.removeEdgesForNode(id);
+  }
+
+  /** Permanently delete cold-storage memories below an energy threshold. */
+  purgeCold(threshold: number): number {
+    const candidates = this.temporalStore.getColdBelowEnergy(threshold);
+    for (const memory of candidates) {
+      this.temporalStore.deleteCold(memory.id);
+    }
+    return candidates.length;
+  }
+
+  /** Restore an archived memory back into the active store (re-embeds it). */
+  async restore(id: string): Promise<MemoryUnit | null> {
+    const memory = this.temporalStore.restore(id);
+    if (!memory) return null;
+    const embedding = await this.embedFn(memory.content);
+    this.vectorStore.upsert(id, embedding);
+    return memory;
+  }
+
+  getColdStats(): { count: number } {
+    return this.temporalStore.getColdStats();
   }
 
   delete(id: string): void {

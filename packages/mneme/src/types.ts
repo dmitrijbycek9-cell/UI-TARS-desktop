@@ -16,6 +16,13 @@ export interface ConfidenceScore {
   lastVerified: Date;
 }
 
+/**
+ * Discriminates the role of a memory. `episodic` is a normal interaction
+ * memory; `config` is reserved for future self-improvement (worker prompts /
+ * coordination rules stored as memories); `meta` is a consolidated insight.
+ */
+export type MemoryKind = 'episodic' | 'config' | 'meta';
+
 export interface MemoryUnit {
   id: string;
   content: string;
@@ -27,6 +34,7 @@ export interface MemoryUnit {
   createdAt: Date;
   lastAccessedAt: Date;
   energyScore: number;
+  kind?: MemoryKind;
 }
 
 export interface TriStoreSearchResult {
