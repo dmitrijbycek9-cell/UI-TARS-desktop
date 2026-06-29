@@ -25,12 +25,12 @@ export const termuxBridge = {
   // ---- Verbindung zur Bridge prüfen (automatisch) ----
   async checkConnection(silent = true) {
     const url = (await this.getBridgeUrl()).replace(/\/+$/, "");
-    const token = await this.getToken();
+    const auth = await this.getToken();
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 3000);
     try {
       const res = await fetch(url + "/health", {
-        headers: token ? { "X-Token": token } : {},
+        headers: auth ? { "X-Token": auth } : {},
         signal: ctrl.signal,
       });
       clearTimeout(t);
@@ -56,7 +56,7 @@ export const termuxBridge = {
 
     // Bridge-Modus: über HTTP ausführen und Ausgabe spiegeln
     const url = (await this.getBridgeUrl()).replace(/\/+$/, "");
-    const token = await this.getToken();
+    const auth = await this.getToken();
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 60000);
     try {
@@ -64,7 +64,7 @@ export const termuxBridge = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { "X-Token": token } : {}),
+          ...(auth ? { "X-Token": auth } : {}),
         },
         body: JSON.stringify({ cmd: clean }),
         signal: ctrl.signal,

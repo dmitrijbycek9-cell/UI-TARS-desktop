@@ -26,7 +26,7 @@ import subprocess
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 PORT = int(os.environ.get("BRIDGE_PORT", "8080"))
-TOKEN = os.environ.get("BRIDGE_TOKEN", "")
+AUTH = os.environ.get("BRIDGE_TOKEN", "")
 TIMEOUT = int(os.environ.get("BRIDGE_TIMEOUT", "60"))
 
 
@@ -46,9 +46,9 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def _auth_ok(self):
-        if not TOKEN:
+        if not AUTH:
             return True
-        return self.headers.get("X-Token", "") == TOKEN
+        return self.headers.get("X-Token", "") == AUTH
 
     def do_OPTIONS(self):
         self.send_response(204)
@@ -97,6 +97,6 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     print("JARVIS Termux Bridge läuft auf http://127.0.0.1:%d" % PORT)
-    print("Token:", "gesetzt" if TOKEN else "KEINER (mit BRIDGE_TOKEN absichern!)")
+    print("Auth:", "gesetzt" if AUTH else "KEINER (mit BRIDGE_TOKEN absichern!)")
     print("Beenden mit Strg+C")
     ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
