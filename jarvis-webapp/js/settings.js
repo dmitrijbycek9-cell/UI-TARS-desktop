@@ -3,7 +3,7 @@
    TTS/Stimme, Backup/Import, Daten löschen
    ================================================================ */
 
-import { PROVIDERS, PROVIDER_KEYS, getDefaultModel } from "./config.js";
+import { PROVIDERS, PROVIDER_KEYS, getDefaultModel, SYSTEM_PROMPT } from "./config.js";
 import {
   getSetting,
   setSetting,
@@ -90,7 +90,26 @@ export async function loadSettings() {
 
   const ttsEl = $("#ttsToggle");
   if (ttsEl) ttsEl.checked = (await getSetting("tts")) || false;
+
+  const personaEl = $("#personaPrompt");
+  if (personaEl) personaEl.value = await getSetting("system_prompt", SYSTEM_PROMPT);
 }
+
+// JARVIS-Persönlichkeits-Vorlagen (MERKE-Hinweis bleibt für die Wissensbank)
+const MERKE_HINT =
+  ' Wenn der Nutzer dir etwas wirklich Wichtiges mitteilt, hänge ans Ende eine Zeile "MERKE: [Info]" an — nur wenn es wirklich wichtig ist.';
+const PERSONA_PRESETS = {
+  standard: SYSTEM_PROMPT,
+  kurz:
+    "Du bist JARVIS, der Assistent von Dima. Antworte extrem knapp und sachlich auf Deutsch — nur das Nötigste, keine Floskeln." +
+    MERKE_HINT,
+  locker:
+    "Du bist JARVIS, der Assistent von Dima. Sei locker, freundlich und mit etwas Humor, auf Deutsch. Halte dich kurz." +
+    MERKE_HINT,
+  experte:
+    "Du bist JARVIS, ein technischer Experte und Assistent von Dima. Antworte präzise und fachlich fundiert auf Deutsch, mit kurzen Beispielen wenn hilfreich." +
+    MERKE_HINT,
+};
 
 // =================================================================
 // EVENT-BINDINGS
@@ -156,6 +175,24 @@ export function initSettings() {
     toast("Stimme ausgewählt");
   });
 
+  // JARVIS-Persönlichkeit
+  $("#personaPrompt")?.addEventListener("change", async (e) => {
+    await setSetting("system_prompt", e.target.value.trim());
+    toast("Persönlichkeit gespeichert");
+  });
+  $("#personaPresets")?.addEventListener("click", async (e) => {
+    const chip = e.target.closest(".preset-chip");
+    if (!chip) return;
+    const text = PERSONA_PRESETS[chip.dataset.persona] || SYSTEM_PROMPT;
+    const el = $("#personaPrompt");
+    if (el) el.value = text;
+    await setSetting("system_prompt", text);
+    toast("Vorlage übernommen");
+  });
+
+  // Chat als Markdown exportieren
+  $("#exportChatBtn")?.addEventListener("click", exportChatMarkdown);
+
   // Backup / Import / Wipe
   $("#exportBtn")?.addEventListener("click", exportBackup);
   $("#importBtn")?.addEventListener("click", () => $("#importFile")?.click());
@@ -192,6 +229,26 @@ async function testKey(provider, btn) {
 // =================================================================
 // BACKUP / IMPORT / WIPE
 // =================================================================
+
+async function exportChatMarkdown() {
+  const msgs = (await dbAll("chat")).sort((a, b) => a.created - b.created);
+  if (!msgs.length) {
+    toast("Kein Chat zum Exportieren");
+    return;
+  }
+  const lines = ["# JARVIS Chat — " + new Date().toLocaleString("de-DE"), ""];
+  for (const m of msgs) {
+    lines.push((m.role === "user" ? "**Du:** " : "**JARVIS:** ") + m.text, "");
+  }
+  const blob = new Blob([lines.join("\n")], { type: "text/markdown" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "jarvis-chat-" + new Date().toISOString().slice(0, 10) + ".md";
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("Chat exportiert");
+}
 
 async function exportBackup() {
   const data = { version: "jarvis-webapp-v1", exportedAt: new Date().toISOString() };

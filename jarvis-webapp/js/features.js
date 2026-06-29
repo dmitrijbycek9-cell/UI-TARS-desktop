@@ -2,7 +2,7 @@
    JARVIS — Aufgaben, Notizen, Gedächtnis (CRUD + Rendering)
    ================================================================ */
 
-import { dbAll, dbGet, dbPut, dbDel } from "./db.js";
+import { dbAll, dbGet, dbPut, dbDel, getSetting, setSetting } from "./db.js";
 import { $, esc, fmt, now, toast } from "./ui.js";
 
 // =================================================================
@@ -204,6 +204,78 @@ export function initMemory() {
       const row = e.target.closest(".mem");
       await dbDel("memory", row.dataset.id);
       await renderMemory(currentMemFilter());
+    }
+  });
+}
+
+// =================================================================
+// EIGENE SCHNELLAKTIONEN (in den Einstellungen via IndexedDB-Settings)
+// =================================================================
+
+export async function getCustomActions() {
+  return (await getSetting("custom_actions")) || [];
+}
+
+export async function renderCustomActions() {
+  const list = $("#customActionList");
+  if (!list) return;
+  const items = await getCustomActions();
+  if (!items.length) {
+    list.innerHTML =
+      '<p class="empty">Noch keine eigenen Aktionen. Lege oben eine an.</p>';
+    return;
+  }
+  list.innerHTML = items
+    .map(
+      (a) => `
+    <button class="action-card custom" data-prompt="${esc(a.prompt)}">
+      <span class="btn-del" data-action="custom-del" data-id="${a.id}" title="Löschen">&times;</span>
+      <div class="action-icon" style="color:var(--amber)">⭐</div>
+      <div class="action-title">${esc(a.title)}</div>
+      <div class="action-desc">${esc(a.prompt.slice(0, 48))}</div>
+    </button>`
+    )
+    .join("");
+}
+
+export async function addCustomAction(title, prompt) {
+  title = (title || "").trim();
+  prompt = (prompt || "").trim();
+  if (!title || !prompt) {
+    toast("Titel und Prompt eingeben");
+    return;
+  }
+  const items = await getCustomActions();
+  items.push({ id: "a" + now(), title, prompt });
+  await setSetting("custom_actions", items);
+  await renderCustomActions();
+  toast("Aktion gespeichert");
+}
+
+async function deleteCustomAction(id) {
+  const items = (await getCustomActions()).filter((a) => a.id !== id);
+  await setSetting("custom_actions", items);
+  await renderCustomActions();
+}
+
+export function initCustomActions() {
+  const titleEl = $("#customActionTitle");
+  const promptEl = $("#customActionPrompt");
+  const submit = async () => {
+    await addCustomAction(titleEl.value, promptEl.value);
+    titleEl.value = "";
+    promptEl.value = "";
+  };
+  $("#customActionAdd")?.addEventListener("click", submit);
+  promptEl?.addEventListener("keydown", (e) => e.key === "Enter" && submit());
+
+  // Löschen abfangen, bevor der globale .action-card-Handler (chat.js) feuert
+  $("#customActionList")?.addEventListener("click", (e) => {
+    const del = e.target.closest('[data-action="custom-del"]');
+    if (del) {
+      e.stopPropagation();
+      e.preventDefault();
+      deleteCustomAction(del.dataset.id);
     }
   });
 }

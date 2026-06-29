@@ -12,6 +12,8 @@ import {
   renderNotes,
   initMemory,
   renderMemory,
+  initCustomActions,
+  renderCustomActions,
 } from "./features.js";
 import { termuxBridge, initTermux } from "./termux.js";
 import { buildProviderUI, loadSettings, initSettings } from "./settings.js";
@@ -30,6 +32,7 @@ async function startApp() {
   await renderTasks();
   await renderNotes();
   await renderMemory();
+  await renderCustomActions();
   await termuxBridge.renderHistory();
   await termuxBridge.renderScripts();
   setStatus("bereit");
@@ -45,6 +48,7 @@ async function startApp() {
   initTasks();
   initNotes();
   initMemory();
+  initCustomActions();
   initTermux();
   initSettings();
 

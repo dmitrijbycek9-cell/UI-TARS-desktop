@@ -191,7 +191,8 @@ export async function sendMessage(text) {
   const memText = mem.length
     ? "Was du über Dima weißt:\n" + mem.map((m) => "- " + m.text).join("\n")
     : "";
-  const sys = SYSTEM_PROMPT + (memText ? "\n\n" + memText : "");
+  const persona = await getSetting("system_prompt", SYSTEM_PROMPT);
+  const sys = (persona || SYSTEM_PROMPT) + (memText ? "\n\n" + memText : "");
 
   const thinking = addMessage("jarvis", cfg.name + " denkt nach…", {
     thinking: true,

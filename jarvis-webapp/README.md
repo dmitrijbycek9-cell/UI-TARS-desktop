@@ -10,6 +10,9 @@ einen persönlichen KI-Assistenten mit mehreren Providern.
 - **Chat** mit Markdown-Darstellung, Kopieren pro Nachricht, Stopp-Button,
   Verlauf löschen und automatischer `MERKE:`-Erfassung ins Gedächtnis.
 - **Aufgaben**, **Notizen** (Titel + Inhalt), **Gedächtnis** (mit Suche).
+- **Anpassbare JARVIS-Persönlichkeit** (editierbarer System-Prompt + Vorlagen).
+- **Eigene Schnellaktionen** (selbst angelegte Prompt-Karten in „Aktionen").
+- **Chat-Export als Markdown**.
 - **Termux-Bridge** (Android-Terminal): ein winziger HTTP-Server läuft in
   Termux (`termux-bridge-server.py`), die Webapp verbindet sich per
   `http://localhost` und führt Befehle aus **mit gespiegelter Ausgabe** im

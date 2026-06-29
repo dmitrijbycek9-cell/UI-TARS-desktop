@@ -86,6 +86,14 @@
         <div class="action-desc">Stichpunkte generieren</div>
       </button>
     </div>
+
+    <div class="section-title sub">Eigene Aktionen</div>
+    <div class="task-input-row">
+      <input type="text" id="customActionTitle" class="ca-title" placeholder="Titel…">
+      <input type="text" id="customActionPrompt" placeholder="Prompt-Vorlage…">
+      <button id="customActionAdd" aria-label="Aktion hinzufügen">+</button>
+    </div>
+    <div id="customActionList" class="grid-2"></div>
   </section>
 
   <!-- ── AUFGABEN ── -->
@@ -232,6 +240,19 @@
       <div class="hint">Wähle, welcher KI-Provider für den Chat verwendet wird.</div>
     </div>
 
+    <!-- JARVIS-Persönlichkeit -->
+    <div class="setting top-divider">
+      <label for="personaPrompt">JARVIS-Persönlichkeit (System-Prompt)</label>
+      <textarea id="personaPrompt" class="note-input" placeholder="Wie soll JARVIS antworten?"></textarea>
+      <div class="persona-presets" id="personaPresets">
+        <button class="preset-chip" data-persona="standard">Standard</button>
+        <button class="preset-chip" data-persona="kurz">Kurz &amp; sachlich</button>
+        <button class="preset-chip" data-persona="locker">Locker</button>
+        <button class="preset-chip" data-persona="experte">Experte</button>
+      </div>
+      <div class="hint">Bestimmt, wie JARVIS antwortet. Gilt für alle Provider.</div>
+    </div>
+
     <!-- TTS -->
     <div class="setting toggle-row">
       <label style="margin:0">Sprachausgabe (Jarvis liest vor)</label>
@@ -244,6 +265,7 @@
 
     <!-- Backup -->
     <div class="setting top-divider">
+      <button class="secondary-btn" id="exportChatBtn">Chat als Markdown</button>
       <button class="secondary-btn" id="exportBtn">Backup exportieren</button>
       <button class="secondary-btn" id="importBtn">Backup importieren</button>
       <input type="file" id="importFile" accept="application/json" hidden>

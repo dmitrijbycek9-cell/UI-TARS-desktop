@@ -147,6 +147,21 @@ body {
 
 /* ─── Action Cards ─── */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.action-card { position: relative; }
+.action-card.custom { border-color: rgba(255,180,84,.3); }
+.action-card.custom .btn-del {
+  position: absolute; top: 4px; right: 6px; width: 22px; height: 22px;
+  display: grid; place-items: center; color: var(--muted); font-size: 18px;
+  border-radius: 6px; line-height: 1;
+}
+.action-card.custom .btn-del:active { color: var(--red); background: var(--red-dim); }
+.ca-title { flex: 0 0 34% !important; }
+.persona-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.preset-chip {
+  background: var(--panel); border: 1px solid var(--line); color: var(--text);
+  border-radius: 16px; padding: 6px 12px; font-size: 12px; font-family: inherit; cursor: pointer;
+}
+.preset-chip:active { transform: scale(.96); border-color: var(--cyan-dim); }
 .action-card {
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
   padding: 16px 12px; text-align: center; cursor: pointer; transition: .12s; font-family: inherit;
