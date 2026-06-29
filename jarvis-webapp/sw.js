@@ -1,7 +1,7 @@
 /* JARVIS Service Worker — installierbar & offline-fähig.
    Bei Updates CACHE_NAME hochzählen. */
 
-const CACHE_NAME = "jarvis-v1";
+const CACHE_NAME = "jarvis-v2";
 const ASSETS = [
   "./index.html",
   "./styles.css",

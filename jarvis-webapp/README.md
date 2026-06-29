@@ -10,8 +10,11 @@ einen persönlichen KI-Assistenten mit mehreren Providern.
 - **Chat** mit Markdown-Darstellung, Kopieren pro Nachricht, Stopp-Button,
   Verlauf löschen und automatischer `MERKE:`-Erfassung ins Gedächtnis.
 - **Aufgaben**, **Notizen** (Titel + Inhalt), **Gedächtnis** (mit Suche).
-- **Termux-Bridge** (Android-Terminal über Intents) inkl. Verlauf, gespeicherte
-  Skripte und SSH-Quick-Connect.
+- **Termux-Bridge** (Android-Terminal): ein winziger HTTP-Server läuft in
+  Termux (`termux-bridge-server.py`), die Webapp verbindet sich per
+  `http://localhost` und führt Befehle aus **mit gespiegelter Ausgabe** im
+  Terminal-Fenster. Automatische Verbindung beim Öffnen des Tabs, Verlauf,
+  gespeicherte Skripte, SSH-Quick-Connect. Intent-„App öffnen" als Fallback.
 - **Sprachein-/-ausgabe** (Web Speech API), **Backup/Import**, **Setup-Assistent**.
 - Offline-fähig (Service Worker) und installierbar (Manifest).
 

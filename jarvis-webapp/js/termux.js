@@ -1,27 +1,104 @@
 /* ================================================================
-   JARVIS — Termux Bridge (Android-Terminal über Intents)
-   Hinweis: Funktioniert nur auf Android mit installierter Termux-App.
+   JARVIS — Termux Bridge
+   Zwei Modi:
+   1) HTTP-Bridge (empfohlen): ein kleiner Server läuft in Termux,
+      die Webapp verbindet sich per fetch zu http://localhost:<port>.
+      → echte Ausführung + Ausgabe wird in der Webapp gespiegelt.
+   2) Intent-Fallback: öffnet nur die Termux-App (keine Rückgabe).
    ================================================================ */
 
 import { $, esc, fmt, now, toast } from "./ui.js";
 import { getSetting, setSetting } from "./db.js";
 
+const DEFAULT_BRIDGE = "http://localhost:8080";
+
 export const termuxBridge = {
+  connected: false,
+
+  async getBridgeUrl() {
+    return (await getSetting("termux_bridge_url")) || DEFAULT_BRIDGE;
+  },
+  async getToken() {
+    return (await getSetting("termux_bridge_token")) || "";
+  },
+
+  // ---- Verbindung zur Bridge prüfen (automatisch) ----
+  async checkConnection(silent = true) {
+    const url = (await this.getBridgeUrl()).replace(/\/+$/, "");
+    const token = await this.getToken();
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 3000);
+    try {
+      const res = await fetch(url + "/health", {
+        headers: token ? { "X-Token": token } : {},
+        signal: ctrl.signal,
+      });
+      clearTimeout(t);
+      this.connected = res.ok;
+      this.updateStatus(res.ok);
+      if (!silent) toast(res.ok ? "Termux-Bridge verbunden" : "Bridge antwortet nicht");
+      return res.ok;
+    } catch {
+      clearTimeout(t);
+      this.connected = false;
+      this.updateStatus(false);
+      if (!silent) toast("Keine Verbindung zur Termux-Bridge");
+      return false;
+    }
+  },
+
+  // ---- Befehl ausführen ----
   async runCommand(cmd) {
     const clean = cmd.trim();
     if (!clean) return;
     await this.addToHistory(clean);
+    this.appendOutput("$ " + clean, "cmd");
 
+    // Bridge-Modus: über HTTP ausführen und Ausgabe spiegeln
+    const url = (await this.getBridgeUrl()).replace(/\/+$/, "");
+    const token = await this.getToken();
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 60000);
     try {
-      window.location.href = `intent:#Intent;action=com.termux.RUN_COMMAND;S.com.termux.RUN_COMMAND_PATH=/data/data/com.termux/files/usr/bin/bash;S.com.termux.RUN_COMMAND_ARGUMENTS=-c,${encodeURIComponent(
-        clean
-      )};end`;
-      toast("Befehl an Termux gesendet: " + clean.substring(0, 30));
+      const res = await fetch(url + "/exec", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { "X-Token": token } : {}),
+        },
+        body: JSON.stringify({ cmd: clean }),
+        signal: ctrl.signal,
+      });
+      clearTimeout(t);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      if (data.stdout) this.appendOutput(data.stdout, "out");
+      if (data.stderr) this.appendOutput(data.stderr, "err");
+      this.appendOutput("[exit " + (data.code ?? 0) + "]", "meta");
+      this.connected = true;
       this.updateStatus(true);
+      return;
     } catch (e) {
-      console.error("Termux Error:", e);
-      toast("Termux konnte nicht erreicht werden");
+      clearTimeout(t);
+      // Fallback auf Intent (öffnet Termux, ohne Rückgabe)
+      this.appendOutput(
+        "⚠ Keine Bridge erreichbar — versuche Intent (keine Ausgabe-Spiegelung möglich).",
+        "err"
+      );
+      this.connected = false;
       this.updateStatus(false);
+      this.runViaIntent(clean);
+    }
+  },
+
+  runViaIntent(cmd) {
+    try {
+      window.location.href = `intent:#Intent;action=com.termux.RUN_COMMAND;package=com.termux;component=com.termux/com.termux.app.RunCommandService;S.com.termux.RUN_COMMAND_PATH=/data/data/com.termux/files/usr/bin/bash;S.com.termux.RUN_COMMAND_ARGUMENTS=-c,${encodeURIComponent(
+        cmd
+      )};B.com.termux.RUN_COMMAND_BACKGROUND=true;end`;
+      toast("Intent an Termux gesendet (ohne Rückgabe)");
+    } catch {
+      toast("Termux konnte nicht erreicht werden");
       this.openTermux();
     }
   },
@@ -54,8 +131,23 @@ export const termuxBridge = {
     if (dot) dot.classList.toggle("connected", connected);
     if (text)
       text.textContent = connected
-        ? "Termux verbunden"
+        ? "Termux-Bridge verbunden"
         : "Termux nicht verbunden";
+  },
+
+  // ---- Ausgabe-Spiegelung ----
+  appendOutput(text, kind = "out") {
+    const out = $("#termuxOutput");
+    if (!out) return;
+    const line = document.createElement("div");
+    line.className = "termux-out-line " + kind;
+    line.textContent = text;
+    out.appendChild(line);
+    out.scrollTop = out.scrollHeight;
+  },
+  clearOutput() {
+    const out = $("#termuxOutput");
+    if (out) out.innerHTML = "";
   },
 
   // ---- Verlauf ----
@@ -140,6 +232,34 @@ export const termuxBridge = {
 };
 
 export function initTermux() {
+  // Bridge-URL / Token laden + speichern
+  (async () => {
+    const urlEl = $("#bridgeUrl");
+    const tokEl = $("#bridgeToken");
+    if (urlEl) urlEl.value = await termuxBridge.getBridgeUrl();
+    if (tokEl) tokEl.value = await termuxBridge.getToken();
+  })();
+
+  $("#bridgeUrl")?.addEventListener("change", (e) =>
+    setSetting("termux_bridge_url", e.target.value.trim())
+  );
+  $("#bridgeToken")?.addEventListener("change", (e) =>
+    setSetting("termux_bridge_token", e.target.value.trim())
+  );
+  $("#bridgeConnect")?.addEventListener("click", async () => {
+    await setSetting("termux_bridge_url", $("#bridgeUrl")?.value.trim() || DEFAULT_BRIDGE);
+    await setSetting("termux_bridge_token", $("#bridgeToken")?.value.trim() || "");
+    termuxBridge.checkConnection(false);
+  });
+  $("#termuxOutClear")?.addEventListener("click", () => termuxBridge.clearOutput());
+
+  // Setup-Befehl kopieren
+  $("#bridgeCopy")?.addEventListener("click", () => {
+    const code = $("#bridgeSetupCmd")?.textContent || "";
+    navigator.clipboard?.writeText(code).then(() => toast("Befehl kopiert"));
+  });
+
+  // Eigener Befehl
   $("#termuxRun")?.addEventListener("click", () => {
     const input = $("#termuxInput");
     if (input?.value) {
@@ -154,7 +274,7 @@ export function initTermux() {
     }
   });
 
-  // Schnell-Befehle (Event-Delegation)
+  // Schnell-Befehle
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".termux-cmd");
     if (btn?.dataset.cmd) termuxBridge.runCommand(btn.dataset.cmd);
@@ -166,7 +286,7 @@ export function initTermux() {
     if (btn?.dataset.cmd) termuxBridge.runCommand(btn.dataset.cmd);
   });
 
-  // Skripte ausführen / löschen
+  // Skripte
   $("#termuxScripts")?.addEventListener("click", (e) => {
     const item = e.target.closest(".termux-script-item");
     if (!item) return;
@@ -205,5 +325,10 @@ export function initTermux() {
       "_blank",
       "noopener"
     )
+  );
+
+  // Automatische Verbindung, wenn der Termux-Tab geöffnet wird
+  $('.tabbar button[data-target="view-terminal"]')?.addEventListener("click", () =>
+    termuxBridge.checkConnection(true)
   );
 }

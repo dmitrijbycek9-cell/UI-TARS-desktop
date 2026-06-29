@@ -131,8 +131,33 @@
       <span id="termuxStatusText">Termux nicht verbunden</span>
     </div>
     <div class="truth-box">
-      <b>HINWEIS:</b> Termux-Bridge benötigt die installierte Termux-App (Android). Befehle werden über Intents gesendet; Ergebnisse erscheinen in der Termux-App.
+      <b>So funktioniert's:</b> Damit Befehle ausgeführt <i>und die Ausgabe hier gespiegelt</i> wird, läuft ein winziger Server in Termux. Die Webapp verbindet sich per <code>http://localhost</code>. (Intents allein können keine Ausgabe zurückgeben.)
     </div>
+
+    <!-- Bridge-Setup -->
+    <div class="section-title sub">1) Bridge in Termux starten</div>
+    <div class="hint" style="margin-bottom:8px">Einmal in Termux einfügen &amp; ausführen (Python ist in Termux vorinstalliert):</div>
+    <div class="bridge-setup">
+      <code id="bridgeSetupCmd">curl -s https://raw.githack.com/dmitrijbycek9-cell/UI-TARS-desktop/HEAD/jarvis-webapp/termux-bridge-server.py -o ~/jarvis-bridge.py 2>/dev/null || true; python ~/jarvis-bridge.py</code>
+      <button class="secondary-btn" id="bridgeCopy">Kopieren</button>
+    </div>
+    <div class="hint" style="margin-bottom:14px">Alternativ liegt das Skript im Repo unter <code>jarvis-webapp/termux-bridge-server.py</code>. Standard-Port 8080.</div>
+
+    <!-- Bridge-Verbindung -->
+    <div class="section-title sub">2) Verbinden</div>
+    <div class="ssh-box">
+      <input id="bridgeUrl" placeholder="http://localhost:8080" autocomplete="off">
+      <button id="bridgeConnect" class="ssh-btn">🔌 Verbinden</button>
+    </div>
+    <div class="task-input-row">
+      <input type="text" id="bridgeToken" placeholder="Token (optional, empfohlen)…">
+    </div>
+
+    <!-- Gespiegelte Ausgabe -->
+    <div class="section-title sub">Terminal-Ausgabe
+      <button class="secondary-btn termux-out-clear" id="termuxOutClear">leeren</button>
+    </div>
+    <div id="termuxOutput" class="termux-output"><div class="termux-out-line meta">Noch keine Ausgabe. Verbinde dich mit der Bridge und sende einen Befehl.</div></div>
 
     <div class="section-title sub">Schnell-Befehle</div>
     <div class="termux-grid">
