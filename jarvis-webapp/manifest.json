@@ -1,0 +1,21 @@
+{
+  "name": "JARVIS — Multi-Model KI-Assistent",
+  "short_name": "JARVIS",
+  "description": "Persönlicher KI-Assistent mit 6 Providern (Claude, ChatGPT, Gemini, DeepSeek, Qwen, Kimi), Aufgaben, Notizen, Gedächtnis und Termux-Bridge.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0e14",
+  "theme_color": "#0a0e14",
+  "lang": "de",
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Neuer Chat", "url": "./index.html#view-chat" },
+    { "name": "Aufgaben", "url": "./index.html#view-tasks" },
+    { "name": "Notizen", "url": "./index.html#view-notes" }
+  ]
+}
