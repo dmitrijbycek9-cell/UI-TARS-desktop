@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0e14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>JARVIS — Multi-Model KI-Assistent</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<!-- ====== HEADER ====== -->
+<header class="app-header">
+  <div class="header-brand">
+    <div class="logo-ring"><div class="logo-core"></div></div>
+    <h1>JARVIS</h1>
+  </div>
+  <div class="status-wrap">
+    <span class="status-dot" id="statusDot"></span>
+    <span class="status-text" id="statusText">Offline</span>
+  </div>
+</header>
+
+<!-- ====== MAIN ====== -->
+<main id="app">
+
+  <!-- ── CHAT ── -->
+  <section id="view-chat" class="view active">
+    <div id="chatHistory"></div>
+    <div class="composer">
+      <button class="icon-btn mic" id="micBtn" title="Spracheingabe" aria-label="Spracheingabe">🎙️</button>
+      <textarea id="chatInput" rows="1" placeholder="Befehl oder Nachricht…"></textarea>
+      <button class="icon-btn clear" id="chatClear" title="Chat leeren" aria-label="Chat leeren">🗑️</button>
+      <button class="icon-btn send" id="chatSend" title="Senden" aria-label="Senden">➤</button>
+      <button class="icon-btn stop" id="chatStop" title="Stopp" aria-label="Stopp" style="display:none">■</button>
+    </div>
+  </section>
+
+  <!-- ── AKTIONEN ── -->
+  <section id="view-actions" class="view">
+    <div class="section-title">Schnellaktionen</div>
+    <div class="grid-2">
+      <button class="action-card" data-prompt="Zusammenfassen:">
+        <div class="action-icon" style="color:var(--cyan)">📝</div>
+        <div class="action-title">Zusammenfassen</div>
+        <div class="action-desc">Text kompakt auf den Punkt bringen</div>
+      </button>
+      <button class="action-card" data-prompt="Übersetze ins Englische:">
+        <div class="action-icon" style="color:var(--green)">🌐</div>
+        <div class="action-title">Übersetzen EN</div>
+        <div class="action-desc">Deutsch → Englisch</div>
+      </button>
+      <button class="action-card" data-prompt="Übersetze ins Deutsche:">
+        <div class="action-icon" style="color:var(--green)">🌐</div>
+        <div class="action-title">Übersetzen DE</div>
+        <div class="action-desc">Englisch → Deutsch</div>
+      </button>
+      <button class="action-card" data-prompt="Erkläre einfach:">
+        <div class="action-icon" style="color:var(--amber)">💡</div>
+        <div class="action-title">Einfach erklären</div>
+        <div class="action-desc">Komplexes verständlich machen</div>
+      </button>
+      <button class="action-card" data-prompt="Schreibe eine E-Mail:">
+        <div class="action-icon" style="color:var(--cyan)">✉️</div>
+        <div class="action-title">E-Mail verfassen</div>
+        <div class="action-desc">Professionelle E-Mail</div>
+      </button>
+      <button class="action-card" data-prompt="Korrigiere und verbessere:">
+        <div class="action-icon" style="color:var(--red)">✅</div>
+        <div class="action-title">Korrigieren</div>
+        <div class="action-desc">Rechtschreibung & Stil</div>
+      </button>
+      <button class="action-card" data-prompt="Erstelle eine To-Do-Liste aus:">
+        <div class="action-icon" style="color:var(--cyan)">✔️</div>
+        <div class="action-title">To-Do erstellen</div>
+        <div class="action-desc">Aus Text Aufgaben extrahieren</div>
+      </button>
+      <button class="action-card" data-prompt="Erstelle Notizen aus:">
+        <div class="action-icon" style="color:var(--amber)">📑</div>
+        <div class="action-title">Notizen erstellen</div>
+        <div class="action-desc">Stichpunkte generieren</div>
+      </button>
+    </div>
+  </section>
+
+  <!-- ── AUFGABEN ── -->
+  <section id="view-tasks" class="view">
+    <div class="section-title">Aufgaben</div>
+    <div class="task-input-row">
+      <input type="text" id="taskInput" placeholder="Neue Aufgabe…">
+      <button id="taskAddBtn" aria-label="Hinzufügen">+</button>
+    </div>
+    <div id="taskList"></div>
+  </section>
+
+  <!-- ── NOTIZEN ── -->
+  <section id="view-notes" class="view">
+    <div class="section-title">Notizen</div>
+    <div class="task-input-row">
+      <input type="text" id="noteTitle" placeholder="Titel der Notiz…">
+      <button id="noteAddBtn" aria-label="Neue Notiz">+</button>
+    </div>
+    <textarea id="noteBody" class="note-input" placeholder="Inhalt…"></textarea>
+    <div id="noteList"></div>
+  </section>
+
+  <!-- ── MEMORY ── -->
+  <section id="view-memory" class="view">
+    <div class="section-title">Gedächtnis</div>
+    <div class="hint" style="margin-bottom:16px">Hier speichert JARVIS wichtige Fakten über dich — wenn du etwas speicherst, erinnert er sich daran.</div>
+    <div class="task-input-row">
+      <input type="text" id="memoryInput" placeholder="Fakt speichern (z.B. 'Meine Lieblingsfarbe ist blau')…">
+      <button id="memoryAddBtn" aria-label="Speichern">+</button>
+    </div>
+    <div class="task-input-row">
+      <input type="text" id="memorySearch" placeholder="🔍 Durchsuchen…">
+    </div>
+    <div id="memoryList"></div>
+  </section>
+
+  <!-- ── TERMUX ── -->
+  <section id="view-terminal" class="view">
+    <div class="section-title">Termux Bridge — Android Terminal</div>
+    <div class="termux-status" id="termuxStatus">
+      <span class="termux-dot" id="termuxDot"></span>
+      <span id="termuxStatusText">Termux nicht verbunden</span>
+    </div>
+    <div class="truth-box">
+      <b>HINWEIS:</b> Termux-Bridge benötigt die installierte Termux-App (Android). Befehle werden über Intents gesendet; Ergebnisse erscheinen in der Termux-App.
+    </div>
+
+    <div class="section-title sub">Schnell-Befehle</div>
+    <div class="termux-grid">
+      <button class="termux-cmd" data-cmd="ls -la"><span class="cmd-icon">📂</span><span class="cmd-name">ls -la</span></button>
+      <button class="termux-cmd" data-cmd="pwd"><span class="cmd-icon">📍</span><span class="cmd-name">pwd</span></button>
+      <button class="termux-cmd" data-cmd="whoami"><span class="cmd-icon">👤</span><span class="cmd-name">whoami</span></button>
+      <button class="termux-cmd" data-cmd="neofetch"><span class="cmd-icon">🖥️</span><span class="cmd-name">neofetch</span></button>
+      <button class="termux-cmd" data-cmd="uname -a"><span class="cmd-icon">🔧</span><span class="cmd-name">uname -a</span></button>
+      <button class="termux-cmd" data-cmd="df -h"><span class="cmd-icon">💾</span><span class="cmd-name">df -h</span></button>
+      <button class="termux-cmd" data-cmd="top -b -n 1 | head -20"><span class="cmd-icon">📊</span><span class="cmd-name">top</span></button>
+      <button class="termux-cmd" data-cmd="ps aux"><span class="cmd-icon">⚙️</span><span class="cmd-name">ps aux</span></button>
+    </div>
+
+    <div class="section-title sub">Netzwerk & Prozesse</div>
+    <div class="termux-grid">
+      <button class="termux-cmd" data-cmd="ifconfig"><span class="cmd-icon">🌐</span><span class="cmd-name">ifconfig</span></button>
+      <button class="termux-cmd" data-cmd="ping -c 3 8.8.8.8"><span class="cmd-icon">📡</span><span class="cmd-name">ping google</span></button>
+      <button class="termux-cmd" data-cmd="netstat -tuln"><span class="cmd-icon">🔌</span><span class="cmd-name">netstat</span></button>
+      <button class="termux-cmd" data-cmd="uptime"><span class="cmd-icon">⏱️</span><span class="cmd-name">uptime</span></button>
+    </div>
+
+    <div class="section-title sub">Python & Dev</div>
+    <div class="termux-grid">
+      <button class="termux-cmd" data-cmd="python3 --version"><span class="cmd-icon">🐍</span><span class="cmd-name">Python Version</span></button>
+      <button class="termux-cmd" data-cmd="node --version"><span class="cmd-icon">🟢</span><span class="cmd-name">Node Version</span></button>
+      <button class="termux-cmd" data-cmd="pip list | head -20"><span class="cmd-icon">📦</span><span class="cmd-name">pip packages</span></button>
+      <button class="termux-cmd" data-cmd="git --version"><span class="cmd-icon">🔀</span><span class="cmd-name">git ver</span></button>
+    </div>
+
+    <div class="section-title sub">Eigener Befehl</div>
+    <div class="add-row">
+      <input id="termuxInput" placeholder="Befehl eingeben…" autocomplete="off">
+      <button id="termuxRun">▶</button>
+    </div>
+
+    <div class="section-title sub">SSH Quick-Connect</div>
+    <div class="ssh-box">
+      <input id="sshHost" placeholder="user@host" autocomplete="off">
+      <input id="sshPort" placeholder="Port" value="22" class="ssh-port">
+      <button id="sshConnect" class="ssh-btn">🔗 SSH</button>
+    </div>
+
+    <div class="section-title sub">Befehlsverlauf</div>
+    <div id="termuxHistory"></div>
+
+    <div class="section-title sub">Gespeicherte Skripte</div>
+    <div id="termuxScripts"></div>
+    <div class="add-row" style="margin-top:8px">
+      <input id="scriptName" placeholder="Skript-Name…" class="script-name-input">
+      <input id="scriptCmd" placeholder="Befehl…">
+      <button id="scriptSave">💾</button>
+    </div>
+
+    <div class="section-title sub" style="margin-top:20px">Termux-App</div>
+    <button class="secondary-btn" id="openTermuxBtn">📱 Termux App öffnen</button>
+    <button class="secondary-btn" id="installTermuxBtn" style="margin-top:8px">⬇️ Termux aus Play Store</button>
+  </section>
+
+  <!-- ── EINSTELLUNGEN ── -->
+  <section id="view-settings" class="view">
+    <div class="section-title">KI-Provider & Einstellungen</div>
+
+    <!-- Provider-Tabs (dynamisch) -->
+    <div class="provider-tabs" id="providerTabs"></div>
+    <!-- Provider-Panels (dynamisch) -->
+    <div id="providerPanels"></div>
+
+    <!-- Aktiver Chat-Provider -->
+    <div class="setting top-divider">
+      <label for="primaryProvider">Aktiver Chat-Provider</label>
+      <select id="primaryProvider"></select>
+      <div class="hint">Wähle, welcher KI-Provider für den Chat verwendet wird.</div>
+    </div>
+
+    <!-- TTS -->
+    <div class="setting toggle-row">
+      <label style="margin:0">Sprachausgabe (Jarvis liest vor)</label>
+      <span class="switch"><input type="checkbox" id="ttsToggle"><span class="slider"></span></span>
+    </div>
+    <div class="setting">
+      <label for="voiceSelect">Stimme</label>
+      <select id="voiceSelect"></select>
+    </div>
+
+    <!-- Backup -->
+    <div class="setting top-divider">
+      <button class="secondary-btn" id="exportBtn">Backup exportieren</button>
+      <button class="secondary-btn" id="importBtn">Backup importieren</button>
+      <input type="file" id="importFile" accept="application/json" hidden>
+      <div class="hint">Sichert alle Provider-Keys, Chat, Aufgaben, Notizen und Memory. <b>Achtung:</b> das Backup enthält deine API-Keys.</div>
+    </div>
+
+    <!-- Wipe -->
+    <div class="setting">
+      <button class="danger-btn" id="wipeBtn">Alle Daten löschen</button>
+      <div class="hint">Löscht Chat, Aufgaben, Notizen, Memory und alle API-Keys.</div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ====== TABBAR ====== -->
+<nav class="tabbar">
+  <button class="tab active" data-target="view-chat" aria-label="Chat">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    <span>Chat</span>
+  </button>
+  <button class="tab" data-target="view-actions" aria-label="Aktionen">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+    <span>Aktionen</span>
+  </button>
+  <button class="tab" data-target="view-tasks" aria-label="Aufgaben">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+    <span>Aufgaben</span>
+  </button>
+  <button class="tab" data-target="view-notes" aria-label="Notizen">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+    <span>Notizen</span>
+  </button>
+  <button class="tab" data-target="view-memory" aria-label="Memory">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path><path d="M21 3v9h-9"></path></svg>
+    <span>Memory</span>
+  </button>
+  <button class="tab" data-target="view-terminal" aria-label="Terminal">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"></rect><path d="M8 9l3 3-3 3"></path><line x1="13" y1="15" x2="16" y2="15"></line></svg>
+    <span>Termux</span>
+  </button>
+  <button class="tab" data-target="view-settings" aria-label="Einstellungen">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 9.59 15a1.65 1.65 0 0 0-1.82-.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 12.41 9a1.65 1.65 0 0 0 .33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 15 4.59a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.92 0 1.67.74 1.67 1.67v.83"></path></svg>
+    <span>Einstell.</span>
+  </button>
+</nav>
+
+<!-- ====== MODAL ====== -->
+<div id="modalOverlay" class="modal-overlay">
+  <div class="modal">
+    <p id="modalText">Bist du sicher?</p>
+    <div class="modal-btns">
+      <button class="secondary-btn" id="modalCancel">Abbrechen</button>
+      <button class="danger-btn" id="modalConfirm">Löschen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== TOAST ====== -->
+<div id="toast" class="toast"></div>
+
+<!-- ====== SETUP-ASSISTENT ====== -->
+<div id="setupOverlay" class="setup-overlay" style="display:none">
+  <div class="setup-card">
+    <div class="setup-step active" data-step="0">
+      <div class="setup-logo"></div>
+      <h2>Willkommen bei JARVIS</h2>
+      <p class="setup-desc">Dein persönlicher KI-Assistent mit 6 Providern. Bevor es losgeht, richte deine APIs ein.</p>
+      <button class="setup-btn primary" id="setupStart">Los geht's</button>
+      <button class="setup-btn text" id="setupSkip">Überspringen</button>
+    </div>
+
+    <div class="setup-step" data-step="1">
+      <div class="setup-badge optional">OPTIONAL</div>
+      <h2>Bezahlte APIs</h2>
+      <p class="setup-desc">Diese APIs kosten pro Nutzung. Du kannst sie auch später hinzufügen.</p>
+      <div id="setupPaid"></div>
+      <div class="setup-nav">
+        <button class="setup-btn text" id="setupBack1">Zurück</button>
+        <button class="setup-btn primary" id="setupNext1">Weiter</button>
+      </div>
+    </div>
+
+    <div class="setup-step" data-step="2">
+      <div class="setup-badge free">🆓 EMPFOHLEN</div>
+      <h2>Kostenlose APIs</h2>
+      <p class="setup-desc">Diese APIs haben kostenlose Tiers. Ideal für den Einstieg.</p>
+      <div id="setupFree"></div>
+      <div class="setup-nav">
+        <button class="setup-btn text" id="setupBack2">Zurück</button>
+        <button class="setup-btn primary" id="setupNext2">JARVIS starten</button>
+      </div>
+    </div>
+
+    <div class="setup-step" data-step="3">
+      <div class="setup-logo" style="animation: pulse 2s infinite"></div>
+      <h2>JARVIS ist bereit!</h2>
+      <p class="setup-desc" id="setupReadyText">Dein persönlicher Assistent ist einsatzbereit.</p>
+      <div class="setup-summary" id="setupSummary"></div>
+      <button class="setup-btn primary" id="setupFinish">App öffnen</button>
+    </div>
+
+    <div class="setup-progress">
+      <div class="setup-dot active" data-sd="0"></div>
+      <div class="setup-dot" data-sd="1"></div>
+      <div class="setup-dot" data-sd="2"></div>
+      <div class="setup-dot" data-sd="3"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>
