@@ -1,0 +1,158 @@
+# TikTok Auto Producer Config
+# Kopiere zu config.yaml und fülle deine API-Keys ein
+
+# ============================================
+# API KEYS (Kostenlose Tier)
+# ============================================
+
+apis:
+  # Pika AI (kostenlos: 250 Credits/Monat)
+  # Registriere auf: https://pika.art
+  pika:
+    api_key: "YOUR_PIKA_API_KEY"
+    enabled: true
+    credits_limit: 250  # Kostenlos pro Monat
+
+  # Leonardo.ai (kostenlos: 150 Credits/Monat)
+  # Registriere auf: https://leonardo.ai
+  leonardo:
+    api_key: "YOUR_LEONARDO_API_KEY"
+    enabled: true
+    credits_limit: 150
+
+  # Pollinations.ai (KOSTENLOS, UNBEGRENZT, keine Auth nötig)
+  # Keine Registrierung nötig!
+  pollinations:
+    enabled: true
+    unlimited: true
+
+# ============================================
+# VIDEO SETTINGS
+# ============================================
+
+video:
+  aspect_ratio: "9:16"  # TikTok Format
+  width: 1080
+  height: 1920
+  fps: 30
+  bitrate: "5000k"
+  duration_min: 61
+  duration_max: 75
+
+# ============================================
+# GENERIERUNG SETTINGS
+# ============================================
+
+generation:
+  # Welche KI für Bilder?
+  image_generator: "pollinations"  # pollinations, leonardo, oder pika
+
+  # Welche KI für Videos?
+  video_generator: "pika"  # pika oder leonardo
+
+  # Fallback wenn primär nicht funktioniert
+  fallback_image_generator: "leonardo"
+  fallback_video_generator: "leonardo"
+
+  # Qualität (lower = schneller, aber niedriger Qualität)
+  quality: "high"  # low, medium, high
+
+  # Timeout für Generierung (Sekunden)
+  generation_timeout: 300
+
+# ============================================
+# VOICEOVER SETTINGS
+# ============================================
+
+voiceover:
+  # Edge TTS (kostenlos, lokal)
+  enabled: true
+  language: "de-DE"
+  voice: "Microsoft Server Speech Text to Speech Voice (de-DE, KatrineNeural)"
+  # Andere Optionen:
+  # - "Microsoft Server Speech Text to Speech Voice (de-DE, Hans)"
+  # - "Microsoft Server Speech Text to Speech Voice (de-DE, Amala)"
+  rate: 1.0  # 0.5 = langsam, 1.0 = normal, 1.5 = schnell
+  pitch: 1.0
+
+# ============================================
+# MUSIK SETTINGS
+# ============================================
+
+music:
+  # Quelle für royalty-free Musik
+  source: "youtube_audio_library"  # youtube_audio_library oder local
+
+  # Fallback: lokale Musik-Datei (wenn vorhanden)
+  fallback_music_path: "./assets/music/default-dramatic.mp3"
+
+  # Musik-Lautstärke (0-1)
+  volume: 0.4
+
+  # Soll Musik automatisch an Tempo angepasst werden?
+  auto_tempo: true
+
+# ============================================
+# SCHNITT SETTINGS (FFmpeg)
+# ============================================
+
+editing:
+  # Text-Overlay Font
+  font: "Arial"
+  font_size: 72
+  font_color: "white"
+  stroke_width: 2
+  stroke_color: "black"
+
+  # Übergänge
+  transition_type: "fade"  # fade, cut, dissolve
+  transition_duration: 0.3
+
+  # Effekte
+  enable_zoom: true
+  enable_punch_in: true
+  enable_slow_motion: false
+
+# ============================================
+# BATCH PROCESSING
+# ============================================
+
+batch:
+  enabled: true
+  max_parallel: 2  # Wie viele Videos gleichzeitig generieren?
+  retry_failed: true
+  retry_count: 2
+
+# ============================================
+# OUTPUT SETTINGS
+# ============================================
+
+output:
+  directory: "./output"
+  format: "mp4"
+  codec: "h264"
+
+  # Speichere auch einzelne Szenen?
+  save_individual_scenes: false
+
+  # Komprimierung (höher = kleinere Datei, aber niedriger Qualität)
+  compression: "medium"  # low, medium, high
+
+# ============================================
+# LOGGING
+# ============================================
+
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  save_to_file: true
+  log_file: "./logs/producer.log"
+
+# ============================================
+# TESTING MODE
+# ============================================
+
+debug:
+  enabled: false
+  # Im Debug-Mode wird nicht wirklich generiert, sondern nur simuliert
+  mock_generation: false
+  save_debug_frames: true
