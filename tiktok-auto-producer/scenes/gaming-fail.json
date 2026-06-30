@@ -1,0 +1,209 @@
+{
+  "title": "gaming-fail",
+  "description": "Der Gaming-Fail, den 2 Millionen sahen",
+  "duration_target": 62,
+  "hook": "Er war im Stream. 2 Millionen sahen zu. Und dann machte er EINEN Fehler.",
+
+  "voiceover": {
+    "text": "Er war im Stream. 2 Millionen sahen zu. Und dann machte er EINEN Fehler. Alles fiel auseinander. Dieser Streamer war gerade im größten Turnier seiner Karriere. Nervös. Fokussiert. Alle Augen auf ihn. Das Match lief perfekt. Runde für Runde. Er dominierte den Server. Die Chat platzte vor Hype. Er war nur noch zwei Runden vom Sieg entfernt. His Rivale war verzweifelt. Aber dann... Moment. Er klickte auf den falschen Button. Nicht in der Game. Auf seinem PC. Streaming-Software. Alles war weg. Stream. Voice-Chat. Alles offline. 2 Millionen Menschen sahen nur noch Schwarz. Der Chat explodierte. Sein Rivale gewann. Das Match war vorbei. Und er wusste nicht mal, was passiert war. Das ist die Kehrseite von Live-Gaming. Eine Sekunde. Ein Fehler. Alles verloren. Deshalb trainieren Pro-Streamer ihre Tastatur-Blindheit. Ist DIR das auch schon passiert? Schreib mir: Dein schlimmster Gaming-Moment!",
+    "language": "de",
+    "rate": 1.0
+  },
+
+  "scenes": [
+    {
+      "id": 1,
+      "title": "Streamer Setup",
+      "duration": 3,
+      "timing": "0:00-0:03",
+      "image_prompt": "Gaming-Zimmer, 9:16 Hochformat, ein junger männlicher Streamer sitzt vor drei Monitoren, RGB-Lichter hinter dem Setup, LED-Streifen an der Wand, konzentrierter Gesichtsausdruck, Monitorlicht wirft blaues Licht auf sein Gesicht, Streaming-Mikrofon sichtbar, professionelle Gaming-Atmosphäre, cinematic Beleuchtung, realistische 3D-Grafik",
+      "video_prompt": "Kamerabewegung: Langsamer Zoom-In auf den mittleren Monitor (Push-In). Der Streamer atmet, sein Blick geht vom Chat zum Spiel. Subtle Hand-Bewegung zur Maus. Spannung im Gesicht. Monitorlicht pulsiert leicht. Realistische Körperhaltung. Länge: 5 Sekunden.",
+      "text_overlay": {
+        "text": "ER WAR IM STREAM",
+        "timing": "0:00-0:02",
+        "size": "80px",
+        "color": "#FFFFFF",
+        "stroke": "2px #000000"
+      },
+      "sound_mood": "Spannung, Intro-Pad, elektronisch"
+    },
+
+    {
+      "id": 2,
+      "title": "Tournament Lobby",
+      "duration": 5,
+      "timing": "0:03-0:08",
+      "image_prompt": "Streaming-Monitor zeigt Gaming-Turnier-Interface, 9:16 Hochformat-Ansicht, Turnier-Bracket auf Bildschirm sichtbar, Live-Chat im unteren Eck halb sichtbar, mehrere tausend Zuschauer-Counter angedeutet, dramatische Beleuchtung, blaulich-rötliche Neon-Töne, angespannte Atmosphäre, realistische Gaming-UI, cinematic",
+      "video_prompt": "Kamerabewegung: Ruhiger Schwenk über den Monitor-Bereich. Zoom leicht auf das Turnier-Bracket. Der Chat scrollt schnell vorbei. Lichter blinken auf der Tastatur. Atmosphäre wird spannungsvoller. Länge: 5 Sekunden.",
+      "text_overlay": {
+        "text": "2 MILLIONEN ZUSCHAUER",
+        "timing": "0:04-0:08",
+        "size": "70px",
+        "color": "#FF0000",
+        "stroke": "2px #FFFFFF"
+      },
+      "sound_mood": "Spannung wächst, Drum-Beat kommt herein"
+    },
+
+    {
+      "id": 3,
+      "title": "Gaming Action POV",
+      "duration": 7,
+      "timing": "0:08-0:15",
+      "image_prompt": "Ego-Perspektive eines Gaming-Bildschirms, 9:16 Format, Multiplayer-Shooter Game, zwei Spieler kämpfen auf Map, eine Figur dominiert, Gegner wird eliminiert, realistisches Game-Interface mit Crosshair, Health-Bar, Ammo-Counter, minimap in Ecke, cinematic Game-Grafik, dramatische Bewegung",
+      "video_prompt": "Kamerabewegung: First-Person-Perspektive im Spiel. Der Streamer rotiert schnell, zielt auf Gegner, feuert. Gegner stirbt. Schnelle, realistische Reaktion. Nach dem Kill: Kurze Pause, Atemzug. Länge: 6 Sekunden.",
+      "text_overlay": {
+        "text": "RUNDE 1: GEWONNEN",
+        "timing": "0:12-0:15",
+        "size": "75px",
+        "color": "#00FF00",
+        "stroke": "2px #000000"
+      },
+      "sound_mood": "Action-Musik, schneller Beat, Synth, SFX"
+    },
+
+    {
+      "id": 4,
+      "title": "Victory Montage",
+      "duration": 10,
+      "timing": "0:15-0:25",
+      "image_prompt": "Split-Screen oder Montage-Ansicht, 9:16, mehrere Gaming-Momente hintereinander, Streamer gewinnt Runde 2, 3, 4 schnell nacheinander, Sieg-Screens mit Punkte, Chat im Hintergrund wild, die Spannung visuell aufbauend durch Schnitte und Lichtwechsel, professionelle Gaming-Montage, cinematic schnelle Schnitte",
+      "video_prompt": "Kamerabewegung: Schnelle Schnitt-Montage aus 3-4 Gaming-Momenten. Jeder 1-2 Sekunden. Schnelle Übergänge (Cuts). Blinkendes Lichter wenn Sieg. Streamer-Augen folgen Action, konzentriert. Letzter Schnitt: Streamer lehnt sich zurück, zuversichtlich. Länge: 6 Sekunden.",
+      "text_overlays": [
+        {
+          "text": "RUNDE 2: DOMINANZ",
+          "timing": "0:16-0:19",
+          "size": "70px",
+          "color": "#00FF00"
+        },
+        {
+          "text": "RUNDE 3: PERFEKT",
+          "timing": "0:19-0:22",
+          "size": "70px",
+          "color": "#00FF00"
+        },
+        {
+          "text": "NUR NOCH 1 SIEG",
+          "timing": "0:22-0:25",
+          "size": "75px",
+          "color": "#FFA500"
+        }
+      ],
+      "sound_mood": "Schnellere Musik, intensiverer Beat"
+    },
+
+    {
+      "id": 5,
+      "title": "The Error - Critical Moment",
+      "duration": 10,
+      "timing": "0:25-0:35",
+      "image_prompt": "Streamer am Monitor, Hand nähert sich Tastatur, 9:16 Hochformat, dramatische Close-up auf die Hand über Tastatur, intensive Beleuchtung, blue-red Neon Lichter, Finger bewegt sich zu Taste, angespannter Blick im Hintergrund, Monitor zeigt noch Game-Action, aber Streamer ist abgelenkt, cinematic, dramatisches Licht, Moment vor dem Fehler",
+      "video_prompt": "Kamerabewegung: Langsam-Motion-Effekt. Hand bewegt sich in Zeitlupe zu Taste. Streamer schaut kurz weg vom Monitor. Augen verfallen. Finger drückt Taste. SCHNITTSCHNELL wieder zu Normal-Geschwindigkeit. Monitor-Licht blinkt. Realistische Reaktion zeigt Schock. Länge: 6 Sekunden.",
+      "text_overlay": {
+        "text": "FALSCH GEDRÜCKT",
+        "timing": "0:30-0:32",
+        "size": "90px",
+        "color": "#FF0000",
+        "stroke": "5px #000000",
+        "effect": "pulse"
+      },
+      "sound_mood": "Musik stoppt abrupt! Nur Drone-Pad, stille mit Glitch-Sound"
+    },
+
+    {
+      "id": 6,
+      "title": "Stream Offline",
+      "duration": 10,
+      "timing": "0:35-0:45",
+      "image_prompt": "Schwarzer Bildschirm oder blaues 'Disconnected'-Screen, 9:16 Format, der Hintergrund vom Gaming-Room noch angedeutet im Halbdunkel, Streaming-Ikone angedeutet, Streamer sitzt verwirrt vor den dunklen Monitoren, sein Gesicht zeigt Schock und Unverständnis, die LED-Lichter im Zimmer dimmen oder pulsieren schnell, cinematic aber realistisch",
+      "video_prompt": "Kamerabewegung: Quick-Cut vom schwarzen Screen zur Streamer-Reaktion. Streamer starrt verwirrt auf Monitor. Ausdruck zeigt Schock. Seine Hand bewegt sich auf der Suche nach Maus/Tastatur. Zimmer ist sehr still. Monitor-Glanz verschwindet. Länge: 6 Sekunden.",
+      "text_overlays": [
+        {
+          "text": "STREAM OFFLINE",
+          "timing": "0:35-0:38",
+          "size": "75px",
+          "color": "#FFFFFF"
+        },
+        {
+          "text": "2 MILLIONEN SEHEN NUR SCHWARZ",
+          "timing": "0:38-0:42",
+          "size": "65px",
+          "color": "#FF0000"
+        },
+        {
+          "text": "WAS IST PASSIERT?",
+          "timing": "0:42-0:45",
+          "size": "60px",
+          "color": "#FFA500"
+        }
+      ],
+      "sound_mood": "Totale Stille dann Glitch-Sound dann Stille"
+    },
+
+    {
+      "id": 7,
+      "title": "Rival Wins",
+      "duration": 10,
+      "timing": "0:45-0:55",
+      "image_prompt": "Split-Screen: Links oben Rivale-Streamer, rechts Tournament-Ergebnis, 9:16, Rivale schaut verwirrt auf seinen Monitor, Tournament-Bracket zeigt Rivale GEWINNT, dramatische Beleuchtung, Farben wechseln von Blau zu Rot, Streamer im Hauptfenster merkt langsam was passiert ist, realistische Enttäuschung sichtbar, cinematic",
+      "video_prompt": "Kamerabewegung: Schnelle Schnitte zwischen Perspektiven. Streamer realisiert was passiert. Gesicht verfällt. Tournament-Screen zeigt VERLOREN. Rote große Buchstaben. Musik würde stoppen. Emotionale Realisation. Das Match ist vorbei. Länge: 6 Sekunden.",
+      "text_overlays": [
+        {
+          "text": "GEGNER GEWINNT",
+          "timing": "0:45-0:48",
+          "size": "75px",
+          "color": "#FF0000"
+        },
+        {
+          "text": "DAS MATCH IST VORBEI",
+          "timing": "0:48-0:52",
+          "size": "70px",
+          "color": "#FF0000"
+        },
+        {
+          "text": "UND ER WUSSTE NICHT MAL WARUM",
+          "timing": "0:52-0:55",
+          "size": "65px",
+          "color": "#FFA500"
+        }
+      ],
+      "sound_mood": "Trauriges Drone-Pad, fallender Bass"
+    },
+
+    {
+      "id": 8,
+      "title": "Moral & Question",
+      "duration": 7,
+      "timing": "0:55-0:62",
+      "image_prompt": "Streamer sitzt nachdenklich vor seinen Monitoren, 9:16 Format, reflektierendes Licht auf seinem Gesicht, die LED-Lichter sind aus, nur noch Dimmbeleuchung, melancholische Gaming-Room-Atmosphäre, sein Blick zeigt Reflexion, Monitor zeigt weiter nur schwarz / offline, cinematic, ruhig, lehrreich",
+      "video_prompt": "Kamerabewegung: Statische Kamera oder sehr langsamer Zoom-Out. Streamer atmet tief durch, lehnt sich zurück. Sein Blick geht auf den dunklen Monitor. Kurze Stille. Dann schaut er (subtil) in Kamera-Richtung oder denkt nach. Länge: 5 Sekunden.",
+      "text_overlays": [
+        {
+          "text": "DAS PASSIERT DEN BESTEN",
+          "timing": "0:55-0:58",
+          "size": "70px",
+          "color": "#FFFFFF"
+        },
+        {
+          "text": "NUR... NICHT SO LIVE",
+          "timing": "0:58-0:62",
+          "size": "70px",
+          "color": "#FFFFFF"
+        }
+      ],
+      "sound_mood": "Leichte, ruhige elektronische Musik, ambient"
+    }
+  ],
+
+  "captions": {
+    "tiktok": "Eine Sekunde. Ein Fehler. Alles verloren. 🎮\n\nDas größte Turnier seiner Karriere. 2 Millionen Zuschauer. Und dann... der Moment, der alles veränderte.\n\nDein schlimmster Gaming-Moment? Schreib mir! 👇",
+    "hashtags": ["#GamingFail", "#Twitch", "#Streamer", "#Drama", "#Gaming", "#GamingMoments", "#Esports", "#TwitchDrama"]
+  },
+
+  "music": {
+    "genre": "electronic-dramatic",
+    "mood": "tense-to-melancholic",
+    "source": "youtube_audio_library",
+    "volume": 0.4
+  }
+}
