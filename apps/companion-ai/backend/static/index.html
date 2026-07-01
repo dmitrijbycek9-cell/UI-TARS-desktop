@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Companion AI MVP</title>
+  <style>
+    :root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#070713;color:#fff}
+    *{box-sizing:border-box} body{margin:0;min-height:100vh;background:radial-gradient(circle at 0 0,#55227c,transparent 35%),radial-gradient(circle at 100% 100%,#0a596e,transparent 34%),#070713} button,input,textarea{font:inherit} button{cursor:pointer}.hidden{display:none!important}
+    .glass{background:rgba(15,15,30,.76);border:1px solid rgba(255,255,255,.09);box-shadow:0 24px 70px rgba(0,0,0,.34);backdrop-filter:blur(18px)}
+    .auth{min-height:100vh;display:grid;place-items:center;padding:24px}.card{width:min(430px,100%);border-radius:28px;padding:28px;display:grid;gap:12px}.logo{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#ff4fd8,#7b61ff);font-weight:900;font-size:26px}.muted{color:#aaa6c8}.card h1{margin:4px 0 0}.card p{margin:0 0 8px}label{color:#d9d6ee;font-size:13px;margin-top:6px}input,textarea{width:100%;color:#fff;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 14px;outline:none}textarea{resize:vertical;min-height:88px}input:focus,textarea:focus{border-color:#bb72ff}.btn{border:0;color:#fff;background:linear-gradient(135deg,#ff4fd8,#7b61ff);border-radius:14px;padding:12px 16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:800}.btn:disabled{opacity:.55;cursor:not-allowed}.ghost{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#ddd7ff;border-radius:14px;padding:10px 14px}.error{color:#ff91a7;background:rgba(255,70,100,.12);padding:10px;border-radius:12px}
+    .app{height:100vh;display:grid;grid-template-columns:330px 1fr;gap:16px;padding:16px}.side{border-radius:24px;padding:18px;display:flex;flex-direction:column;min-height:0}.brand{font-weight:900;font-size:19px;margin-bottom:14px}.side h3{color:#d7d2ff;font-size:12px;text-transform:uppercase;letter-spacing:.09em;margin:18px 0 10px}.list{display:flex;flex-direction:column;gap:8px;overflow:auto}.char{display:flex;gap:12px;align-items:center;text-align:left;border:1px solid transparent;background:rgba(255,255,255,.045);border-radius:18px;color:#fff;padding:10px}.char.active{border-color:rgba(255,79,216,.65);background:rgba(255,79,216,.14)}.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#ff4fd8,#35d7ff);font-weight:900;flex:0 0 auto}.meta{min-width:0;display:grid;gap:3px}.meta span,.conv span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#aaa6c8;font-size:12px}.conv{background:rgba(255,255,255,.04);border-radius:14px;padding:10px;display:grid;gap:4px}.logout{margin-top:auto}.chat{border-radius:24px;overflow:hidden;display:grid;grid-template-rows:auto 1fr auto;min-width:0}.head{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08)}.head h2,.head p{margin:0}.head p{color:#aaa6c8}.messages{padding:18px;overflow:auto;display:flex;flex-direction:column;gap:12px}.empty{margin:auto;text-align:center;max-width:560px;color:#cdc8e8}.empty h2{margin-bottom:8px}.bubble{max-width:min(760px,84%);padding:13px 15px;border-radius:20px;line-height:1.45;white-space:pre-wrap}.user{align-self:flex-end;background:linear-gradient(135deg,#246bff,#7b61ff);border-bottom-right-radius:6px}.assistant{align-self:flex-start;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);border-bottom-left-radius:6px}.typing{color:#aaa6c8}.composer{border-top:1px solid rgba(255,255,255,.08);padding:14px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.composer textarea{min-height:48px;max-height:150px}.send{width:52px;height:52px;padding:0}.modalbg{position:fixed;inset:0;background:rgba(0,0,0,.62);display:grid;place-items:center;padding:18px}.modal{width:min(720px,100%);max-height:92vh;overflow:auto;border-radius:24px;padding:22px;display:grid;gap:11px}.modal h2{margin:0}.row{display:flex;gap:10px}.row>*{flex:1}.topbar{display:flex;gap:8px;margin-bottom:12px}.small{font-size:12px;color:#aaa6c8}@media(max-width:900px){.app{grid-template-columns:1fr;height:auto;min-height:100vh}.side{min-height:360px}.chat{min-height:70vh}}  
+  </style>
+</head>
+<body>
+  <section id="auth" class="auth">
+    <div class="card glass">
+      <div class="logo">AI</div>
+      <h1>Companion AI</h1>
+      <p class="muted">Lauffähiges MVP: Login, Characters, Memory, WebSocket-Chat, optional Ollama.</p>
+      <div class="topbar"><button id="loginTab" class="btn">Login</button><button id="registerTab" class="ghost">Registrieren</button></div>
+      <label>Username</label><input id="username" value="demo" />
+      <label id="emailLabel" class="hidden">E-Mail optional</label><input id="email" class="hidden" />
+      <label>Passwort</label><input id="password" type="password" value="demo123" />
+      <div id="authError" class="error hidden"></div>
+      <button id="authSubmit" class="btn">Einloggen</button>
+      <p class="small">Demo: demo / demo123</p>
+    </div>
+  </section>
+
+  <section id="app" class="app hidden">
+    <aside class="side glass">
+      <div class="brand">✨ Companion AI</div>
+      <button id="newChar" class="btn">+ Character bauen</button>
+      <h3>Characters</h3>
+      <div id="chars" class="list"></div>
+      <h3>Gespräche</h3>
+      <div id="convs" class="list"></div>
+      <button id="logout" class="ghost logout">Logout</button>
+    </aside>
+    <main class="chat glass">
+      <header class="head"><div id="headAvatar" class="avatar">?</div><div><h2 id="headName">Character wählen</h2><p id="headDesc">Links auswählen oder neuen bauen.</p></div></header>
+      <section id="messages" class="messages"><div class="empty"><h2>Bereit.</h2><p>Wähle einen Character und schreib los.</p></div></section>
+      <footer class="composer"><textarea id="input" placeholder="Nachricht schreiben…"></textarea><button id="send" class="btn send">➤</button></footer>
+    </main>
+  </section>
+
+  <div id="modal" class="modalbg hidden">
+    <div class="modal glass">
+      <h2>Character Creator</h2>
+      <label>Name</label><input id="cName" value="Nova" />
+      <label>Beschreibung</label><textarea id="cDesc">Direkte, charmante KI-Begleiterin mit Humor.</textarea>
+      <label>Persönlichkeit</label><textarea id="cPers">Du bist Nova. Du antwortest warm, intelligent, direkt und mit leichtem Humor. Du bleibst konsistent in deiner Rolle.</textarea>
+      <label>Appearance Prompt</label><textarea id="cApp">cinematic portrait, neon light, elegant futuristic style</textarea>
+      <label>Tags, Komma-getrennt</label><input id="cTags" value="warm,smart,playful" />
+      <div class="row"><button id="saveChar" class="btn">Speichern</button><button id="closeModal" class="ghost">Abbrechen</button></div>
+    </div>
+  </div>
+
+<script>
+const API = location.origin;
+let token = localStorage.getItem('token');
+let user = JSON.parse(localStorage.getItem('user') || 'null');
+let mode = 'login';
+let characters = [];
+let selected = null;
+let conversationId = null;
+let ws = null;
+
+const $ = id => document.getElementById(id);
+function show(el, yes=true){ el.classList.toggle('hidden', !yes); }
+function esc(s){ return String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+async function api(path, opts={}){
+  const res = await fetch(API + path, { ...opts, headers: { 'Content-Type':'application/json', ...(token?{Authorization:'Bearer '+token}:{}), ...(opts.headers||{}) }});
+  const text = await res.text();
+  let data; try{ data = text ? JSON.parse(text) : null; } catch { data = text; }
+  if(!res.ok) throw new Error(data?.detail || data || 'Request failed');
+  return data;
+}
+
+function setMode(next){
+  mode = next;
+  $('loginTab').className = next === 'login' ? 'btn' : 'ghost';
+  $('registerTab').className = next === 'register' ? 'btn' : 'ghost';
+  show($('email'), next === 'register'); show($('emailLabel'), next === 'register');
+  $('authSubmit').textContent = next === 'login' ? 'Einloggen' : 'Account erstellen';
+}
+
+async function authSubmit(){
+  show($('authError'), false);
+  try{
+    const body = { username:$('username').value, password:$('password').value };
+    if(mode === 'register') body.email = $('email').value || null;
+    const data = await api(mode === 'login' ? '/api/auth/login' : '/api/auth/register', { method:'POST', body:JSON.stringify(body) });
+    token = data.access_token; user = data.user;
+    localStorage.setItem('token', token); localStorage.setItem('user', JSON.stringify(user));
+    await boot();
+  }catch(e){ $('authError').textContent = e.message; show($('authError'), true); }
+}
+
+function renderChars(){
+  $('chars').innerHTML = characters.map(c => `<button class="char ${selected?.id===c.id?'active':''}" data-id="${c.id}"><div class="avatar">${esc(c.name[0]||'?')}</div><div class="meta"><strong>${esc(c.name)}</strong><span>${esc(c.description)}</span></div></button>`).join('');
+  document.querySelectorAll('#chars .char').forEach(btn => btn.onclick = () => selectChar(characters.find(c => c.id == btn.dataset.id)));
+}
+function selectChar(c){
+  selected = c; conversationId = null;
+  $('headAvatar').textContent = c.name[0] || '?'; $('headName').textContent = c.name; $('headDesc').textContent = c.description;
+  $('messages').innerHTML = `<div class="empty"><h2>Chatte mit ${esc(c.name)}</h2><p>Wenn Ollama nicht aktiv ist, kommt ein klarer Fallback statt Fake-KI.</p></div>`;
+  renderChars();
+}
+async function loadConvs(){
+  const convs = await api('/api/conversations');
+  $('convs').innerHTML = convs.slice(0,10).map(c => `<div class="conv"><strong>${esc(c.character_name)}</strong><span>${esc(c.last_message || 'Noch keine Nachricht')}</span></div>`).join('') || '<p class="small">Noch keine Gespräche.</p>';
+}
+function addBubble(role, content){
+  const empty = $('messages').querySelector('.empty'); if(empty) empty.remove();
+  const div = document.createElement('article'); div.className = 'bubble ' + role; div.textContent = content; $('messages').appendChild(div); $('messages').scrollTop = $('messages').scrollHeight; return div;
+}
+function connectWs(){
+  if(ws) ws.close();
+  ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/api/ws?token=' + encodeURIComponent(token));
+  ws.onmessage = async ev => {
+    const msg = JSON.parse(ev.data);
+    if(msg.type === 'typing') addBubble('assistant typing', 'Denkt nach…');
+    if(msg.type === 'message'){
+      document.querySelectorAll('.typing').forEach(x => x.remove());
+      conversationId = msg.data.conversation_id;
+      addBubble('assistant', msg.data.message.content);
+      loadConvs().catch(()=>{});
+    }
+    if(msg.type === 'error'){
+      document.querySelectorAll('.typing').forEach(x => x.remove());
+      addBubble('assistant', 'Fehler: ' + msg.detail);
+    }
+  };
+}
+function send(){
+  const text = $('input').value.trim();
+  if(!text || !selected || !ws || ws.readyState !== WebSocket.OPEN) return;
+  $('input').value = ''; addBubble('user', text);
+  ws.send(JSON.stringify({ message:text, character_id:selected.id, conversation_id:conversationId, mood:'neutral' }));
+}
+async function saveChar(){
+  const payload = { name:$('cName').value, description:$('cDesc').value, personality:$('cPers').value, appearance_prompt:$('cApp').value, tags:$('cTags').value.split(',').map(x=>x.trim()).filter(Boolean), is_public:false };
+  const c = await api('/api/characters', { method:'POST', body:JSON.stringify(payload) });
+  characters.push(c); show($('modal'), false); selectChar(c); renderChars();
+}
+async function boot(){
+  if(!token){ show($('auth'), true); show($('app'), false); return; }
+  show($('auth'), false); show($('app'), true);
+  characters = await api('/api/characters');
+  renderChars(); if(!selected && characters[0]) selectChar(characters[0]);
+  await loadConvs(); connectWs();
+}
+$('loginTab').onclick = () => setMode('login'); $('registerTab').onclick = () => setMode('register'); $('authSubmit').onclick = authSubmit;
+$('send').onclick = send; $('input').onkeydown = e => { if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); } };
+$('newChar').onclick = () => show($('modal'), true); $('closeModal').onclick = () => show($('modal'), false); $('saveChar').onclick = () => saveChar().catch(e => alert(e.message));
+$('logout').onclick = () => { localStorage.clear(); token=null; user=null; if(ws) ws.close(); location.reload(); };
+setMode('login'); boot().catch(e => { console.error(e); show($('auth'), true); show($('app'), false); });
+</script>
+</body>
+</html>
